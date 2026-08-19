@@ -3,198 +3,985 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FADLI KICKS // Elite Sneaker Emporium</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>FADLI'S SNEAKER VAULT // Elite Sneaker Emporium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --bg-deep: #f4f5f7;
+            --bg-deep: #f8fafc;
             --bg-panel: rgba(255, 255, 255, 0.9);
             --bg-card: #ffffff;
-            --primary: #10b981;
-            --primary-light: #34d399;
-            --primary-dark: #059669;
+            --primary: #0f172a;
+            --primary-light: #334155;
+            --accent: #2563eb;
             --text-main: #0f172a;
             --text-muted: #64748b;
-            --border-color: rgba(16, 185, 129, 0.22);
-            --glass-blur: blur(20px);
+            --border-color: rgba(226, 232, 240, 0.9);
+            --card-hover-shadow: rgba(15, 23, 42, 0.08);
+            --glass-blur: blur(16px);
         }
-        .dark-mode {
-            --bg-deep: #07090e;
-            --bg-panel: rgba(15, 23, 42, 0.85);
-            --bg-card: #111827;
-            --primary: #10b981;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: rgba(16, 185, 129, 0.3);
-            --glass-blur: blur(24px);
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-deep); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.25s ease, box-shadow 0.25s ease; }
         
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed; inset: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.04) 0%, transparent 45%),
+                        radial-gradient(circle at 85% 85%, rgba(15, 23, 42, 0.03) 0%, transparent 50%);
+            z-index: -1; pointer-events: none;
+        }
+
+        #login-transition-curtain {
+            position: fixed; inset: 0; z-index: 99999;
+            display: flex; pointer-events: none; visibility: hidden;
+        }
+        .curtain-panel {
+            flex: 1; height: 100%;
+            background: linear-gradient(135deg, #e2e8f0, #f8fafc);
+            transform: scaleY(0); transform-origin: top;
+        }
+        #login-transition-curtain.animating { visibility: visible; }
+        #login-transition-curtain.animating .curtain-panel:nth-child(1) {
+            animation: curtainSlideDown 0.6s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+        }
+        #login-transition-curtain.animating .curtain-panel:nth-child(2) {
+            animation: curtainSlideUp 0.6s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+        }
+
+        @keyframes curtainSlideDown {
+            0% { transform: scaleY(0); transform-origin: top; }
+            50% { transform: scaleY(1); transform-origin: top; }
+            100% { transform: scaleY(0); transform-origin: bottom; }
+        }
+        @keyframes curtainSlideUp {
+            0% { transform: scaleY(0); transform-origin: bottom; }
+            50% { transform: scaleY(1); transform-origin: bottom; }
+            100% { transform: scaleY(0); transform-origin: top; }
+        }
+
+        #intro-screen {
+            position: fixed; inset: 0; background: var(--bg-deep); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            animation: fadeOutIntro 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.8s forwards;
+            pointer-events: none;
+        }
+        .intro-logo-box {
+            position: relative; padding: 36px 60px; border-radius: 28px;
+            background: var(--bg-panel); backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.05);
+            animation: introLogoPulse 1.8s ease-in-out infinite alternate;
+            display: flex; flex-direction: column; align-items: center; width: 90%; max-width: 440px;
+        }
+        @keyframes introLogoPulse {
+            0% { transform: scale(0.95); opacity: 0.9; }
+            100% { transform: scale(1.02); opacity: 1; }
+        }
+        .intro-brand {
+            font-size: 26px; font-weight: 800; letter-spacing: 1px; color: var(--text-main); text-align: center;
+        }
+        .intro-subtitle {
+            font-size: 11px; font-weight: 700; letter-spacing: 3px; color: var(--text-muted);
+            margin-top: 6px; text-transform: uppercase; text-align: center;
+        }
+        .intro-loader-bar {
+            width: 100%; height: 3px; background: rgba(100, 116, 139, 0.15); border-radius: 6px;
+            margin-top: 24px; overflow: hidden; position: relative;
+        }
+        .intro-loader-bar::after {
+            content: ''; position: absolute; inset: 0; width: 40%; background: var(--accent);
+            border-radius: 6px; animation: loaderMove 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+        @keyframes loaderMove {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(300%); }
+        }
+        @keyframes fadeOutIntro { to { opacity: 0; visibility: hidden; } }
+
+        .fade-in-view { animation: smoothFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes smoothFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* NAVBAR RESPONSIF DESKTOP & MOBILE */
         #navbar {
-            background: var(--bg-panel); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--border-color);
-            padding: 14px 28px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center;
+            display: none;
+            background: var(--bg-panel); backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid var(--border-color);
+            padding: 14px 20px; position: sticky; top: 0; z-index: 100;
+            justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
+            width: 100%;
         }
-        .brand-title { font-size: 20px; font-weight: 800; color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 8px; }
-        .nav-actions { display: flex; gap: 10px; align-items: center; }
-        .nav-btn { background: var(--bg-deep); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 14px; border-radius: 12px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-        .nav-btn:hover { border-color: var(--primary); }
+        @media(min-width: 768px) {
+            #navbar { padding: 14px 40px; }
+        }
+
+        .brand-title {
+            font-size: 14px; font-weight: 800; letter-spacing: 0.5px; color: var(--text-main);
+            cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px;
+        }
+        @media(min-width: 768px) {
+            .brand-title { font-size: 16px; max-width: none; }
+        }
+        .brand-title:hover { opacity: 0.75; }
+
+        .nav-actions { display: flex; gap: 6px; align-items: center; }
+        @media(min-width: 768px) { .nav-actions { gap: 10px; } }
+
+        .nav-btn {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            color: var(--text-main); padding: 7px 10px; border-radius: 12px;
+            font-size: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px;
+            box-shadow: 0 2px 5px rgba(15, 23, 42, 0.02);
+            white-space: nowrap;
+        }
+        @media(min-width: 768px) {
+            .nav-btn { padding: 8px 14px; font-size: 11px; gap: 6px; }
+        }
+        .nav-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+        .nav-btn.logout { color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
+        .nav-btn.chat-highlight { background: rgba(59, 130, 246, 0.08); border-color: rgba(59, 130, 246, 0.3); color: var(--accent); }
+
         .cart-badge-icon { position: relative; }
-        .cart-count { position: absolute; top: -6px; right: -8px; background: var(--primary); color: #fff; font-size: 9px; font-weight: 800; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-
-        .container { width: 100%; max-width: 1200px; margin: auto; padding: 24px 20px; flex: 1; }
-
-        #floating-chat-btn {
-            position: fixed; bottom: 24px; right: 24px; z-index: 998;
-            background: linear-gradient(135deg, var(--primary-light), var(--primary));
-            color: #ffffff; width: 58px; height: 58px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.45);
+        .cart-count {
+            position: absolute; top: -5px; right: -6px; background: var(--accent); color: #fff;
+            font-size: 9px; font-weight: 800; width: 16px; height: 16px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
         }
-        .floating-chat-badge { position: absolute; top: -2px; right: -2px; background: #ef4444; color: #fff; font-size: 9px; font-weight: 800; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg-deep); }
 
-        .chat-box-container { display: flex; flex-direction: column; height: 380px; background: var(--bg-deep); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-top: 8px; }
-        .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .chat-msg { max-width: 75%; padding: 10px 14px; border-radius: 14px; font-size: 12px; line-height: 1.4; word-break: break-word; }
-        .chat-msg.customer { background: var(--primary); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
-        .chat-msg.admin { background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border-color); align-self: flex-start; border-bottom-left-radius: 4px; }
+        .container { width: 100%; max-width: 1200px; margin: auto; padding: 16px 12px; flex: 1; display: flex; flex-direction: column; }
+        @media(min-width: 768px) { .container { padding: 24px 24px; } }
+        html, body { height: 100%; }
+
+        #view-login { 
+            position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+            width: 100vw; height: 100vh; z-index: 50; padding: 20px;
+        }
+        
+        .login-card {
+            background: var(--bg-panel); backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-color);
+            padding: 40px 28px; border-radius: 24px; width: 100%; max-width: 400px; text-align: center;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.05);
+            animation: bounceInCard 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes bounceInCard {
+            0% { transform: scale(0.85); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .login-card h1 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+        .login-card p { font-size: 12px; color: var(--text-muted); margin-bottom: 24px; }
+        
+        .login-options { display: flex; flex-direction: column; gap: 12px; }
+        .login-btn-opt {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            padding: 15px; border-radius: 14px; font-weight: 700; font-size: 12px;
+            color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.02);
+            transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .login-btn-opt:hover { border-color: var(--accent); background: rgba(59, 130, 246, 0.03); transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 20px rgba(59,130,246,0.1); }
+
+        .flash-sale-box {
+            background: var(--bg-panel); backdrop-filter: var(--glass-blur); border: 1px solid var(--border-color);
+            color: var(--text-main); padding: 14px 20px; border-radius: 16px; margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.02);
+            animation: flashPulse 3s ease-in-out infinite alternate;
+        }
+        @keyframes flashPulse {
+            0% { border-color: rgba(226, 232, 240, 0.9); }
+            100% { border-color: rgba(59, 130, 246, 0.4); }
+        }
+        .flash-title { font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 8px; color: var(--accent); }
+        .flash-timer { background: var(--bg-card); border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 10px; font-weight: 800; font-size: 12px; }
+
+        .brand-marquee {
+            width: 100%; overflow: hidden; white-space: nowrap; margin-bottom: 20px;
+            background: var(--bg-panel); backdrop-filter: var(--glass-blur); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px 0;
+        }
+        .brand-marquee-track { display: inline-flex; gap: 40px; animation: marqueeScroll 20s linear infinite; }
+        .brand-item { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .brand-item span { color: var(--accent); }
+        @keyframes marqueeScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        .category-filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 18px; scrollbar-width: none; }
+        .category-pill {
+            background: var(--bg-panel); backdrop-filter: var(--glass-blur); border: 1px solid var(--border-color); color: var(--text-muted);
+            padding: 8px 18px; border-radius: 16px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap;
+            transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .category-pill.active, .category-pill:hover { background: var(--accent); color: #fff; border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(59,130,246,0.2); }
+
+        .panel-box {
+            background: var(--bg-panel); backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--border-color); padding: 20px; border-radius: 20px; margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.03);
+            width: 100%;
+        }
+        @media(min-width: 768px) { .panel-box { padding: 24px; } }
+
+        .panel-box h2 {
+            font-size: 14px; font-weight: 700; margin-bottom: 16px; color: var(--text-main);
+            display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;
+        }
+        @media(min-width: 768px) { .panel-box h2 { font-size: 15px; } }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+        @media(min-width: 768px) { .form-grid { grid-template-columns: repeat(2, 1fr); } }
+        
+        .input-group { margin-bottom: 12px; }
+        .input-group.full { grid-column: 1 / -1; }
+        .input-group label {
+            display: block; font-size: 10px; font-weight: 700; color: var(--text-muted);
+            margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        
+        .shop-input, .shop-file {
+            width: 100%; padding: 12px 16px; border-radius: 12px;
+            border: 1px solid var(--border-color); background: var(--bg-card);
+            color: var(--text-main); font-size: 12px; outline: none; font-family: inherit;
+            transition: 0.3s;
+        }
+        .shop-input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(59, 130, 246, 0.12); transform: translateY(-1px); }
+
+        input[type="file"]::file-selector-button {
+            background: var(--bg-deep); color: var(--text-main); border: 1px solid var(--border-color);
+            padding: 6px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-right: 8px;
+        }
+
+        .btn-main {
+            width: 100%; background: var(--text-main);
+            color: #ffffff; padding: 13px; border: none; border-radius: 12px;
+            font-weight: 800; font-size: 11px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.1); margin-top: 8px;
+            transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn-main:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 8px 22px rgba(15, 23, 42, 0.18); }
+
+        .btn-dm {
+            width: 100%; background: var(--bg-card); border: 1px solid var(--border-color);
+            color: var(--text-main); padding: 13px; border-radius: 12px;
+            font-weight: 800; font-size: 11px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+            margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: 0.3s;
+        }
+        .btn-dm:hover { background: rgba(59, 130, 246, 0.05); border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+        .btn-secondary {
+            width: 100%; background: var(--bg-card); border: 1px solid var(--border-color);
+            color: var(--text-main); padding: 13px; border-radius: 12px;
+            font-weight: 800; font-size: 11px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+            margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: 0.3s;
+        }
+        .btn-secondary:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+        .btn-danger-outline {
+            background: transparent; border: 1px solid rgba(239, 68, 68, 0.4); color: #ef4444;
+            padding: 12px; border-radius: 12px; font-weight: 700; font-size: 11px; cursor: pointer; width: 100%; margin-top: 6px;
+            transition: 0.3s;
+        }
+        .btn-danger-outline:hover { background: rgba(239, 68, 68, 0.05); transform: translateY(-1px); }
+
+        .chat-box-container {
+            display: flex; flex-direction: column; height: 350px; background: var(--bg-card);
+            border: 1px solid var(--border-color); border-radius: 14px; overflow: hidden; margin-top: 8px;
+        }
+        .chat-messages { flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .chat-msg { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 11px; line-height: 1.4; animation: smoothFadeIn 0.3s ease; position: relative; word-break: break-word; }
+        .chat-msg.customer { background: var(--accent); color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .chat-msg.admin { background: #f1f5f9; color: #1e293b; border: 1px solid var(--border-color); align-self: flex-start; border-bottom-left-radius: 2px; }
+        
+        .chat-msg-actions {
+            display: flex; gap: 6px; margin-top: 6px; font-size: 9px; opacity: 0.85; justify-content: flex-end;
+        }
+        .chat-action-btn {
+            background: rgba(255, 255, 255, 0.2); border: none; color: inherit; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-weight: 700;
+        }
+        .chat-msg.admin .chat-action-btn { background: rgba(0, 0, 0, 0.08); }
+        .chat-action-btn:hover { opacity: 1; transform: scale(1.05); }
+
         .chat-input-row { display: flex; padding: 10px; background: var(--bg-panel); border-top: 1px solid var(--border-color); gap: 8px; }
 
-        .flash-sale-box { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: #fff; padding: 14px 22px; border-radius: 18px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
-        .category-filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 20px; }
-        .category-pill { background: var(--bg-panel); border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 16px; border-radius: 14px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-        .category-pill.active, .category-pill:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+        /* BANNER SLIDER DENGAN ANIMASI FOTO GULING HALUS & EFEK NIKE KEREN (RESPONSIF MOBILE & DESKTOP) */
+        .slider-container {
+            width: 100%; height: 260px; border-radius: 20px; border: 1px solid var(--border-color);
+            position: relative; overflow: hidden; margin-bottom: 20px; background: var(--bg-card);
+            box-shadow: 0 15px 35px rgba(15, 23, 42, 0.06);
+            perspective: 1500px;
+        }
+        @media(min-width: 768px) { .slider-container { height: 380px; } }
+        
+        .slider-track { display: flex; width: 100%; height: 100%; position: relative; }
+        
+        .slide-item {
+            position: absolute; inset: 0; opacity: 0; visibility: hidden;
+            transform: translateX(-100%) rotateY(-45deg) scale(0.9);
+            transform-origin: left center;
+            transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.9s ease;
+            display: flex; align-items: center; justify-content: space-between; padding: 20px;
+            cursor: pointer;
+        }
+        @media(min-width: 768px) { .slide-item { padding: 32px 40px; } }
 
-        .search-box { position: relative; width: 100%; margin-bottom: 20px; }
-        .search-box input { width: 100%; padding: 13px 18px 13px 46px; border-radius: 16px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-main); font-size: 13px; outline: none; }
+        .slide-item.active { 
+            opacity: 1; visibility: visible; z-index: 2; 
+            transform: translateX(0) rotateY(0deg) scale(1);
+        }
+        .slide-item.exit-right {
+            transform: translateX(100%) rotateY(45deg) scale(0.9);
+            opacity: 0;
+            z-index: 1;
+            transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.9s ease;
+        }
+
+        .slide-bg {
+            position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0;
+            filter: brightness(0.95);
+            animation: kenBurnsZoom 8s ease-in-out infinite alternate;
+        }
+        @keyframes kenBurnsZoom {
+            0% { transform: scale(1) rotate(0deg); }
+            100% { transform: scale(1.08) rotate(1.5deg); }
+        }
+
+        .slide-item:hover .slide-bg {
+            filter: brightness(1.05) contrast(1.1);
+        }
+
+        .nike-banner-swoosh {
+            position: absolute; right: -10px; bottom: -20px; font-size: 110px; font-weight: 900;
+            color: rgba(255, 255, 255, 0.18); font-style: italic; z-index: 1; pointer-events: none;
+            letter-spacing: -8px; transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: swooshFloat 4s ease-in-out infinite alternate;
+        }
+        @media(min-width: 768px) {
+            .nike-banner-swoosh { font-size: 170px; right: -15px; bottom: -35px; letter-spacing: -12px; }
+        }
+        @keyframes swooshFloat {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-10px) scale(1.03); }
+        }
+
+        .slide-item:hover .nike-banner-swoosh {
+            transform: scale(1.12) translateX(-15px) rotate(-3deg);
+            color: rgba(59, 130, 246, 0.3);
+            text-shadow: 0 0 35px rgba(59, 130, 246, 0.6);
+        }
+
+        .nike-badge-glow {
+            position: absolute; top: 14px; right: 14px; z-index: 3;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff;
+            padding: 5px 10px; border-radius: 16px; font-size: 9px; font-weight: 800;
+            letter-spacing: 1px; text-transform: uppercase;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.6);
+            animation: nikeGlowPulse 2s infinite alternate;
+        }
+        @media(min-width: 768px) {
+            .nike-badge-glow { top: 20px; right: 20px; padding: 7px 16px; font-size: 10px; letter-spacing: 1.2px; }
+        }
+        @keyframes nikeGlowPulse {
+            0% { box-shadow: 0 0 10px rgba(37, 99, 235, 0.4); transform: scale(1); }
+            100% { box-shadow: 0 0 30px rgba(37, 99, 235, 0.9); transform: scale(1.06); }
+        }
+        
+        .slide-item::before {
+            content: ''; position: absolute; inset: 0; z-index: 1;
+            background: linear-gradient(90deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.7) 65%, transparent 100%);
+        }
+
+        .slide-content { 
+            position: relative; z-index: 2; max-width: 75%; 
+            animation: bannerTextIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both; 
+        }
+        @media(min-width: 768px) { .slide-content { max-width: 55%; } }
+        @keyframes bannerTextIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-badge {
+            background: rgba(59, 130, 246, 0.08); color: var(--accent); border: 1px solid var(--border-color);
+            font-size: 8px; font-weight: 800; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; display: inline-block; margin-bottom: 6px;
+        }
+        @media(min-width: 768px) { .slide-badge { font-size: 9px; padding: 4px 10px; margin-bottom: 8px; } }
+
+        .slide-title { font-size: 15px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; }
+        @media(min-width: 768px) { .slide-title { font-size: 24px; margin-bottom: 6px; } }
+
+        .slide-desc { font-size: 10px; color: var(--text-muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        @media(min-width: 768px) { .slide-desc { font-size: 11px; line-height: 1.5; } }
+
+        .slider-dots { position: absolute; bottom: 12px; right: 16px; z-index: 3; display: flex; gap: 5px; }
+        @media(min-width: 768px) { .slider-dots { bottom: 14px; right: 20px; gap: 6px; } }
+        .dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(100, 116, 139, 0.3); cursor: pointer; transition: 0.3s; }
+        @media(min-width: 768px) { .dot { width: 6px; height: 6px; } }
+        .dot.active { width: 18px; border-radius: 4px; background: var(--text-main); }
+        @media(min-width: 768px) { .dot.active { width: 22px; } }
+
+        .user-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; gap: 10px; }
+        .search-box { position: relative; width: 100%; }
+        .search-box input {
+            width: 100%; padding: 12px 18px 12px 44px; border-radius: 30px;
+            border: 1px solid var(--border-color); background: var(--bg-panel); backdrop-filter: var(--glass-blur);
+            color: var(--text-main); font-size: 12px; outline: none;
+        }
         .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
 
-        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
         @media(min-width: 768px) { .products-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
-        .product-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; transition: 0.25s ease; }
-        .product-card:hover { transform: translateY(-4px); border-color: var(--primary); }
-        .product-media-wrap { width: 100%; height: 160px; background: var(--bg-deep); position: relative; }
-        .product-img { width: 100%; height: 100%; object-fit: cover; }
-        .product-body { padding: 14px; display: flex; flex-direction: column; flex-grow: 1; }
-        .product-title { font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
-        .product-price { font-size: 13px; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
-        .btn-buy { margin-top: auto; width: 100%; background: var(--primary); color: #fff; border: none; padding: 10px; border-radius: 12px; font-weight: 700; font-size: 11px; cursor: pointer; text-transform: uppercase; }
 
-        .panel-box { background: var(--bg-panel); backdrop-filter: var(--glass-blur); border: 1px solid var(--border-color); padding: 24px; border-radius: 24px; margin-bottom: 20px; }
-        .panel-box h2 { font-size: 16px; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
-        .shop-input { width: 100%; padding: 12px 16px; border-radius: 14px; border: 1px solid var(--border-color); background: var(--bg-deep); color: var(--text-main); font-size: 13px; outline: none; }
-        .btn-main { width: 100%; background: var(--primary); color: #ffffff; padding: 13px; border: none; border-radius: 14px; font-weight: 800; font-size: 12px; cursor: pointer; text-transform: uppercase; margin-top: 8px; }
-        .btn-dm { width: 100%; background: #0ea5e9; color: #ffffff; padding: 13px; border: none; border-radius: 14px; font-weight: 800; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
+        .product-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 18px; overflow: hidden; display: flex; flex-direction: column;
+            cursor: pointer; transition: 0.35s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 4px 15px rgba(15, 23, 42, 0.02); position: relative;
+            animation: smoothFadeIn 0.5s ease;
+        }
+        .product-card:hover { transform: translateY(-6px) scale(1.01); border-color: var(--accent); box-shadow: 0 12px 30px var(--card-hover-shadow); }
+
+        .product-media-wrap { width: 100%; height: 150px; background: #f1f5f9; position: relative; overflow: hidden; }
+        @media(min-width: 768px) { .product-media-wrap { height: 210px; } }
+        .product-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .product-card:hover .product-img { transform: scale(1.1); }
+
+        .badge-pro {
+            position: absolute; top: 8px; left: 8px; background: var(--bg-panel); backdrop-filter: blur(8px);
+            color: var(--text-main); border: 1px solid var(--border-color); font-size: 7px; font-weight: 800; padding: 3px 6px; border-radius: 6px; text-transform: uppercase; z-index: 2;
+        }
+        @media(min-width: 768px) { .badge-pro { top: 10px; left: 10px; font-size: 8px; padding: 4px 8px; } }
+
+        .badge-stock {
+            position: absolute; top: 8px; right: 8px; background: rgba(16, 185, 129, 0.9); color: #fff;
+            font-size: 7px; font-weight: 800; padding: 3px 6px; border-radius: 6px; text-transform: uppercase; z-index: 2;
+        }
+        @media(min-width: 768px) { .badge-stock { top: 10px; right: 10px; font-size: 8px; padding: 4px 8px; } }
+        .badge-stock.habis { background: rgba(239, 68, 68, 0.9); }
+
+        .product-body { padding: 12px; display: flex; flex-direction: column; flex-grow: 1; }
+        @media(min-width: 768px) { .product-body { padding: 18px; } }
+
+        .product-title { font-size: 12px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        @media(min-width: 768px) { .product-title { font-size: 14px; margin-bottom: 6px; } }
+
+        .product-price-box { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        @media(min-width: 768px) { .product-price-box { margin-bottom: 8px; } }
+
+        .product-price { font-size: 12px; font-weight: 800; color: var(--text-main); }
+        @media(min-width: 768px) { .product-price { font-size: 16px; } }
+
+        .product-desc { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
+        @media(min-width: 768px) { .product-desc { font-size: 11px; margin-bottom: 10px; } }
+
+        .btn-buy {
+            margin-top: auto; width: 100%; background: var(--bg-deep); border: 1px solid var(--border-color);
+            color: var(--text-main); border-radius: 10px; padding: 8px; font-weight: 700; font-size: 10px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; text-transform: uppercase;
+            transition: 0.3s;
+        }
+        @media(min-width: 768px) { .btn-buy { padding: 10px; font-size: 11px; gap: 6px; } }
+        .product-card:hover .btn-buy { background: var(--text-main); color: #fff; border-color: var(--text-main); }
+
+        .detail-container { display: grid; grid-template-columns: 1fr; gap: 20px; animation: smoothFadeIn 0.4s ease; }
+        @media(min-width: 768px) { .detail-container { grid-template-columns: 1.1fr 0.9fr; gap: 32px; align-items: start; } }
+        
+        .detail-gallery { display: flex; flex-direction: column; gap: 12px; }
+        .detail-main-img { 
+            width: 100%; height: 280px; border-radius: 20px; object-fit: cover; border: 1px solid var(--border-color); cursor: pointer; background: var(--bg-card); 
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease; 
+        }
+        @media(min-width: 768px) { .detail-main-img { height: 440px; } }
+        .detail-main-img.animating { transform: scale(0.95); opacity: 0.2; }
+
+        .detail-thumbs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+        .detail-thumb-img { width: 56px; height: 56px; border-radius: 10px; object-fit: cover; border: 2px solid var(--border-color); cursor: pointer; flex-shrink: 0; transition: 0.3s; }
+        @media(min-width: 768px) { .detail-thumb-img { width: 68px; height: 68px; border-radius: 12px; } }
+        .detail-thumb-img:hover, .detail-thumb-img.active { border-color: var(--accent); transform: scale(1.06); }
+
+        .detail-info-card { background: var(--bg-panel); backdrop-filter: var(--glass-blur); border: 1px solid var(--border-color); padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.03); display: flex; flex-direction: column; gap: 14px; }
+        @media(min-width: 768px) { .detail-info-card { padding: 24px; gap: 16px; } }
+
+        .detail-title { font-size: 18px; font-weight: 800; color: var(--text-main); }
+        @media(min-width: 768px) { .detail-title { font-size: 24px; } }
+
+        .detail-price { font-size: 18px; font-weight: 800; color: var(--text-main); }
+        @media(min-width: 768px) { .detail-price { font-size: 24px; } }
+
+        .detail-desc-text { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+        @media(min-width: 768px) { .detail-desc-text { font-size: 12px; line-height: 1.6; } }
+        
+        .size-selector-box { display: flex; flex-direction: column; gap: 6px; }
+        .size-options { display: flex; gap: 8px; flex-wrap: wrap; }
+        .size-pill {
+            background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main);
+            width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.3s;
+        }
+        @media(min-width: 768px) { .size-pill { width: 38px; height: 38px; } }
+        .size-pill.active, .size-pill:hover { background: var(--accent); color: #fff; border-color: var(--accent); transform: translateY(-2px); }
+
+        .spec-features { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 12px 0; }
+        @media(min-width: 768px) { .spec-features { padding: 14px 0; } }
+        .spec-item { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; color: var(--text-main); }
+
+        /* LIGHTBOX MULTI-FOTO DENGAN GESER & ZOOM */
+        .media-lightbox {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px);
+            z-index: 99999; display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: 0.35s ease; padding: 16px;
+        }
+        @media(min-width: 768px) { .media-lightbox { padding: 20px; } }
+        .media-lightbox.active { opacity: 1; visibility: visible; }
+        .lightbox-content { width: 100%; max-width: 650px; max-height: 85vh; border-radius: 18px; overflow: hidden; border: 1px solid var(--border-color); position: relative; background: #000; display: flex; align-items: center; justify-content: center; animation: zoomLightbox 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes zoomLightbox { from { transform: scale(0.85) rotate(-3deg); opacity: 0; } to { transform: scale(1) rotate(0deg); opacity: 1; } }
+        
+        .lightbox-slider-track { display: flex; width: 100%; height: 100%; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .lightbox-slide { min-width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; }
+        .lightbox-slide img { width: 100%; max-height: 80vh; object-fit: contain; display: block; background: #000; transition: transform 0.3s ease; }
+        .lightbox-slide img:hover { transform: scale(1.05); }
+
+        .lightbox-close { position: absolute; top: 12px; right: 12px; background: rgba(15, 23, 42, 0.7); color: #fff; border: 1px solid rgba(255,255,255,0.3); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; font-size: 15px; transition: 0.3s; }
+        @media(min-width: 768px) { .lightbox-close { top: 16px; right: 16px; width: 36px; height: 36px; font-size: 16px; } }
+        .lightbox-close:hover { transform: rotate(90deg) scale(1.1); background: #fff; color: #000; }
+
+        .lightbox-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(15, 23, 42, 0.6); color: #fff; border: 1px solid rgba(255,255,255,0.2); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; transition: 0.3s; font-size: 16px; }
+        @media(min-width: 768px) { .lightbox-arrow { width: 42px; height: 42px; font-size: 18px; } }
+        .lightbox-arrow:hover { background: var(--accent); border-color: var(--accent); transform: translateY(-50%) scale(1.15); }
+        .lightbox-prev { left: 10px; }
+        @media(min-width: 768px) { .lightbox-prev { left: 16px; } }
+        .lightbox-next { right: 10px; }
+        @media(min-width: 768px) { .lightbox-next { right: 16px; } }
+
+        .lightbox-counter { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.7); color: #fff; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; z-index: 20; border: 1px solid rgba(255,255,255,0.2); }
+        @media(min-width: 768px) { .lightbox-counter { bottom: 16px; padding: 4px 12px; font-size: 11px; } }
+
+        .admin-item {
+            display: flex; flex-direction: column; gap: 10px;
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            padding: 12px; border-radius: 12px; margin-bottom: 10px;
+            animation: smoothFadeIn 0.3s ease;
+        }
+        @media(min-width: 640px) {
+            .admin-item { flex-direction: row; justify-content: space-between; align-items: center; padding: 14px; }
+        }
+        .admin-item-info { display: flex; align-items: center; gap: 10px; }
+        @media(min-width: 768px) { .admin-item-info { gap: 12px; } }
+        .admin-item-img { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; cursor: pointer; transition: transform 0.3s; flex-shrink: 0; }
+        @media(min-width: 768px) { .admin-item-img { width: 50px; height: 50px; } }
+        .admin-item-img:hover { transform: scale(1.1); }
+        .admin-actions { display: flex; gap: 6px; width: 100%; justify-content: flex-end; }
+        @media(min-width: 640px) { .admin-actions { width: auto; } }
+        .btn-sm { padding: 6px 12px; font-size: 11px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-sm:hover { transform: translateY(-1px); }
+        .btn-edit { background: rgba(59, 130, 246, 0.1); color: var(--accent); border: 1px solid var(--border-color); }
+        .btn-del { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+
+        .checkout-box { background: var(--bg-card); border: 1px solid var(--border-color); padding: 14px; border-radius: 14px; display: flex; gap: 12px; align-items: center; margin-bottom: 20px; }
+        @media(min-width: 768px) { .checkout-box { padding: 16px; gap: 14px; } }
+        .checkout-img { width: 56px; height: 56px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+        @media(min-width: 768px) { .checkout-img { width: 64px; height: 64px; } }
 
         .status-timeline { display: flex; flex-direction: column; gap: 14px; margin-top: 14px; }
         .status-step { display: flex; gap: 12px; align-items: flex-start; position: relative; }
-        .status-dot { width: 24px; height: 24px; border-radius: 50%; background: var(--bg-deep); border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; }
-        .status-step.completed .status-dot { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .status-step:not(:last-child)::after {
+            content: ''; position: absolute; left: 11px; top: 24px; width: 2px; height: calc(100% + 4px);
+            background: var(--border-color);
+        }
+        .status-dot { width: 24px; height: 24px; border-radius: 50%; background: var(--bg-card); border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; z-index: 2; flex-shrink: 0; transition: 0.3s; }
+        .status-step.completed .status-dot { background: var(--accent); border-color: var(--accent); color: #fff; transform: scale(1.1); }
+        .status-content h5 { font-size: 12px; font-weight: 700; color: var(--text-main); }
+        .status-content p { font-size: 10px; color: var(--text-muted); }
 
-        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; }
-        .toast-item { background: var(--bg-panel); border: 1px solid var(--border-color); color: var(--text-main); padding: 12px 16px; border-radius: 14px; font-size: 12px; font-weight: 700; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        #toast-container { position: fixed; bottom: 16px; right: 16px; left: 16px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+        @media(min-width: 640px) { #toast-container { left: auto; right: 24px; width: 340px; bottom: 20px; } }
+        .toast-item {
+            background: var(--bg-panel); backdrop-filter: var(--glass-blur); border: 1px solid var(--border-color); color: var(--text-main);
+            padding: 12px 16px; border-radius: 12px; font-size: 11px; font-weight: 700; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+            opacity: 0; transform: translateY(20px) scale(0.95); transition: 0.35s cubic-bezier(0.16, 1, 0.3, 1); display: flex; align-items: center; gap: 10px; pointer-events: auto;
+        }
+        @media(min-width: 768px) { .toast-item { padding: 14px 18px; } }
+        .toast-item.show { opacity: 1; transform: translateY(0) scale(1); }
+
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center; z-index: 999; opacity: 0; visibility: hidden; transition: 0.35s ease; padding: 16px;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-card { background: var(--bg-panel); backdrop-filter: var(--glass-blur); border: 1px solid var(--border-color); padding: 24px 20px; border-radius: 20px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1); animation: smoothFadeIn 0.4s ease; }
+        @media(min-width: 768px) { .modal-card { padding: 30px 24px; } }
     </style>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
-    <div id="floating-chat-btn" onclick="openCustomerChat()" title="Buka DM Chat Toko">
-        <i data-lucide="message-circle" size="24"></i>
-        <span class="floating-chat-badge" id="floatingChatBadge">0</span>
+    <div id="login-transition-curtain">
+        <div class="curtain-panel"></div>
+        <div class="curtain-panel"></div>
     </div>
 
-    <nav id="navbar">
-        <div class="brand-title" onclick="showView('view-user')">
-            <i data-lucide="zap" size="18"></i> FADLI KICKS
+    <div id="intro-screen">
+        <div class="intro-logo-box">
+            <div class="intro-brand">FADLI'S SNEAKER VAULT</div>
+            <div class="intro-subtitle">Elite Sneaker Emporium</div>
+            <div class="intro-loader-bar"></div>
         </div>
+    </div>
+
+    <!-- LIGHTBOX MULTI-FOTO DENGAN TOMBOL GESER & INDIKATOR -->
+    <div class="media-lightbox" id="mediaLightbox" onclick="closeLightbox()">
+        <div class="lightbox-content" onclick="event.stopPropagation()">
+            <div class="lightbox-close" onclick="closeLightbox()">&times;</div>
+            <button class="lightbox-arrow lightbox-prev" id="lightboxPrevBtn" onclick="slideLightbox(-1)">&#10094;</button>
+            <button class="lightbox-arrow lightbox-next" id="lightboxNextBtn" onclick="slideLightbox(1)">&#10095;</button>
+            <div class="lightbox-slider-track" id="lightboxSliderTrack"></div>
+            <div class="lightbox-counter" id="lightboxCounter">1 / 1</div>
+        </div>
+    </div>
+
+    <!-- NAVBAR RESPONSIF -->
+    <nav id="navbar">
+        <div class="brand-title" onclick="goHome()">FADLI'S SNEAKER VAULT</div>
         <div class="nav-actions">
-            <button class="nav-btn cart-badge-icon" onclick="openCartView()">
-                <i data-lucide="shopping-cart" size="15"></i>
+            <button class="nav-btn chat-highlight" onclick="openCustomerChat()" title="Pesan / Live Chat Admin">
+                <i data-lucide="message-square" size="14"></i>
+                <span>Pesan</span>
+            </button>
+            <button class="nav-btn cart-badge-icon" onclick="openCartView()" title="Keranjang Belanja">
+                <i data-lucide="shopping-cart" size="14"></i>
                 <span class="cart-count" id="cartBadgeCount">0</span>
             </button>
-            <button class="nav-btn" onclick="openCekPesanan()">
-                <i data-lucide="package" size="15"></i> Cek Pesanan
+            <button class="nav-btn" onclick="openCekPesanan()" title="Cek Status Pesanan">
+                <i data-lucide="package" size="14"></i>
             </button>
-            <button class="nav-btn" onclick="toggleTheme()"><i data-lucide="sun-medium" id="themeIcon" size="15"></i></button>
+            <button class="nav-btn logout" onclick="logout()"><i data-lucide="log-out" size="13"></i> Keluar</button>
         </div>
     </nav>
 
     <div id="toast-container"></div>
 
+    <div class="modal-overlay" id="adminModal">
+        <div class="modal-card">
+            <i data-lucide="shield-check" size="38" style="color:var(--accent); margin-bottom:12px;"></i>
+            <h3 style="margin-bottom: 6px; font-size: 16px;">Akses Admin Toko</h3>
+            <p style="font-size: 11px; color:var(--text-muted); margin-bottom: 16px;">Masukkan sandi keamanan (Default: admin123)</p>
+            <input type="password" id="adminPass" class="shop-input" placeholder="Password..." style="text-align:center; margin-bottom:16px;">
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-main" style="margin-top:0;" onclick="verifyAdmin()">Masuk</button>
+                <button class="btn-danger-outline" style="margin-top:0;" onclick="closeModal()">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 1: LOGIN -->
+    <div id="view-login" class="fade-in-view">
+        <div class="login-card">
+            <h1>FADLI'S SNEAKER VAULT</h1>
+            <p>Pilih mode akses sistem toko sepatu estetik</p>
+            <div class="login-options">
+                <div class="login-btn-opt" onclick="openAdminModal()">
+                    <i data-lucide="settings" size="18" style="color:var(--accent);"></i> Masuk Sebagai Admin (Kelola Toko & Stok)
+                </div>
+                <div class="login-btn-opt" onclick="loginAsUser()">
+                    <i data-lucide="shopping-bag" size="18" style="color:var(--accent);"></i> Masuk Sebagai Pembeli (Katalog)
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         
-        <div id="view-user" class="fade-in-view">
-            <div class="flash-sale-box">
-                <div>⚡ FLASH SALE EKSLUSIF FADLI KICKS HARI INI!</div>
-                <div id="flashCountdown">04 : 58 : 32</div>
+        <!-- VIEW 2: ADMIN DASHBOARD -->
+        <div id="view-admin" style="display: none;" class="fade-in-view">
+            
+            <div class="panel-box">
+                <h2><i data-lucide="message-square" size="16"></i> Live Pesanan / Chat Masuk dari Pembeli (Saling Terhubung)</h2>
+                <div id="adminChatListContainer"></div>
             </div>
 
-            <div class="category-filters">
+            <div class="panel-box">
+                <h2><i data-lucide="truck" size="16"></i> Kelola Data Supplier Sepatu</h2>
+                <form id="supplierForm" onsubmit="saveSupplier(event)" style="margin-bottom: 14px;">
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label>Nama Perusahaan Supplier</label>
+                            <input type="text" id="sName" class="shop-input" required placeholder="Cth: PT Indosole Jaya">
+                        </div>
+                        <div class="input-group">
+                            <label>Kontak / Telepon Supplier</label>
+                            <input type="text" id="sContact" class="shop-input" required placeholder="Cth: 081298765432">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-main">Tambah Supplier Baru</button>
+                </form>
+                <div id="adminSupplierList"></div>
+            </div>
+
+            <div class="panel-box">
+                <h2 id="formTitle"><i data-lucide="plus-circle" size="16"></i> Input & Edit Barang & Stok Sepatu</h2>
+                <form id="productForm" onsubmit="saveProduct(event)">
+                    <input type="hidden" id="editIndex" value="">
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label>Nama Model Sepatu</label>
+                            <input type="text" id="pName" class="shop-input" required placeholder="Cth: Air Velocity Runner Pro">
+                        </div>
+                        <div class="input-group">
+                            <label>Harga Jual (Rp)</label>
+                            <input type="number" id="pPrice" class="shop-input" required placeholder="Cth: 1850000">
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label>Pilih Kategori</label>
+                            <select id="pCategory" class="shop-input" required>
+                                <option value="Running">Running & Sport</option>
+                                <option value="Streetwear">Streetwear & Casual</option>
+                                <option value="Basketball">Basketball & High-Top</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Jumlah Stok Barang</label>
+                            <input type="number" id="pStock" class="shop-input" required min="0" placeholder="Cth: 25">
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label>Pilih Supplier</label>
+                            <select id="pSupplier" class="shop-input" required>
+                                <option value="">-- Pilih Supplier --</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Upload Foto Utama Sepatu</label>
+                            <input type="file" id="pImgFile" class="shop-file" accept="image/*">
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label>Upload Foto Tambahan 1 (Opsional)</label>
+                            <input type="file" id="pImgFile2" class="shop-file" accept="image/*">
+                        </div>
+                    </div>
+
+                    <div id="extraPhotoContainer"></div>
+
+                    <button type="button" class="btn-secondary" style="margin-bottom: 12px;" onclick="addMorePhotoInput()">
+                        <i data-lucide="plus" size="15"></i> Tambah Kolom Foto Lain
+                    </button>
+
+                    <div class="input-group full">
+                        <label>Deskripsi & Ukuran Tersedia (Size)</label>
+                        <textarea id="pDesc" class="shop-input" rows="3" required placeholder="Cth: Nyaman dipakai lari, tersedia size 40, 41, 42, 43..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-main" id="btnSubmitProd">Simpan Data & Stok Sepatu</button>
+                    <button type="button" class="btn-danger-outline" id="btnCancel" style="display:none;" onclick="resetForm()">Batal Edit</button>
+                </form>
+            </div>
+
+            <div class="panel-box">
+                <h2><i data-lucide="tag" size="16"></i> Daftar Harga & Cek Stok Barang</h2>
+                <div id="adminPriceListView"></div>
+            </div>
+
+            <div class="panel-box">
+                <h2><i data-lucide="clipboard-list" size="16"></i> Lihat Pembelian (Pesanan Masuk)</h2>
+                <div id="adminOrderListContainer"></div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: KATALOG PEMBELI -->
+        <div id="view-user" style="display: none;" class="fade-in-view">
+            
+            <div class="flash-sale-box">
+                <div class="flash-title"><i data-lucide="zap" size="16"></i> FLASH SALE EKSLUSIF HARI INI!</div>
+                <div class="flash-timer" id="flashCountdown">04 : 58 : 32</div>
+            </div>
+
+            <div class="brand-marquee">
+                <div class="brand-marquee-track">
+                    <div class="brand-item"><span>⚡</span> Nike Air Max</div>
+                    <div class="brand-item"><span>🔥</span> Adidas Ultraboost</div>
+                    <div class="brand-item"><span>✨</span> New Balance Elite</div>
+                    <div class="brand-item"><span>🚀</span> Puma Velocity</div>
+                    <div class="brand-item"><span>💎</span> Converse Street</div>
+                </div>
+            </div>
+
+            <!-- BANNER SLIDER DENGAN TEMA NIKE SUPER KEREN & ANIMASI DINAMIS DI-UPGRADE -->
+            <div class="slider-container" id="bannerSlider">
+                <div class="slider-track" id="sliderTrack">
+                    <div class="slide-item active" onclick="openLightbox(['https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop', 'https://images.unsplash.com/photo-1518091043644-c1d4457512c6?q=80&w=1200&auto=format&fit=crop'], 0)">
+                        <div class="nike-badge-glow">NIKE AIR JORDAN ⚡</div>
+                        <div class="nike-banner-swoosh">NIKE</div>
+                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop" class="slide-bg" alt="Nike Air Jordan">
+                        <div class="slide-content">
+                            <span class="slide-badge">NIKE SIGNATURE SERIES</span>
+                            <div class="slide-title">Nike Air Jordan High Hyper Red</div>
+                            <div class="slide-desc">Ikon legendaris Nike dengan teknologi bantalan udara terbaik untuk gaya dan performa maksimal Anda.</div>
+                        </div>
+                    </div>
+                    <div class="slide-item" onclick="openLightbox(['https://images.unsplash.com/photo-1518091043644-c1d4457512c6?q=80&w=1200&auto=format&fit=crop', 'https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=1200&auto=format&fit=crop'], 0)">
+                        <div class="nike-badge-glow">NIKE RUNNING 🚀</div>
+                        <div class="nike-banner-swoosh">JUST DO IT</div>
+                        <img src="https://images.unsplash.com/photo-1518091043644-c1d4457512c6?q=80&w=1200&auto=format&fit=crop" class="slide-bg" alt="Nike Velocity Pro">
+                        <div class="slide-content">
+                            <span class="slide-badge">NIKE PRO ATHLETE</span>
+                            <div class="slide-title">Nike Velocity Red Fire Runner</div>
+                            <div class="slide-desc">Sepatu lari berteknologi mutakhir dengan sirkulasi udara optimal dan daya cengkeram tingkat tinggi.</div>
+                        </div>
+                    </div>
+                    <div class="slide-item" onclick="openLightbox(['https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=1200&auto=format&fit=crop'], 0)">
+                        <div class="nike-badge-glow">STREETWEAR ELITE 🔥</div>
+                        <div class="nike-banner-swoosh">AIR</div>
+                        <img src="https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=1200&auto=format&fit=crop" class="slide-bg" alt="Urban Street High-Top">
+                        <div class="slide-content">
+                            <span class="slide-badge">COLLECTION VAULT</span>
+                            <div class="slide-title">Urban Street High-Top Sneaker</div>
+                            <div class="slide-desc">Gaya streetwear urban kekinian dengan material kulit premium tahan lama dan penuh gaya.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slider-dots" id="sliderDots">
+                    <div class="dot active" onclick="currentSlide(0)"></div>
+                    <div class="dot" onclick="currentSlide(1)"></div>
+                    <div class="dot" onclick="currentSlide(2)"></div>
+                </div>
+            </div>
+
+            <div class="category-filters" id="categoryFilters">
                 <div class="category-pill active" onclick="filterCategory('All', this)">Semua Koleksi</div>
                 <div class="category-pill" onclick="filterCategory('Running', this)">🏃‍♂️ Running</div>
                 <div class="category-pill" onclick="filterCategory('Streetwear', this)">🔥 Streetwear</div>
                 <div class="category-pill" onclick="filterCategory('Basketball', this)">🏀 Basketball</div>
             </div>
 
-            <div class="search-box">
-                <i data-lucide="search" size="16" class="search-icon"></i>
-                <input type="text" id="searchKeyword" placeholder="Cari model sepatu impian..." oninput="renderCatalog()">
+            <div class="user-top-bar">
+                <div class="search-box">
+                    <i data-lucide="search" size="16" class="search-icon"></i>
+                    <input type="text" id="searchKeyword" placeholder="Cari model sepatu impian..." oninput="renderCatalog()">
+                </div>
             </div>
 
             <div class="products-grid" id="catalogGrid"></div>
         </div>
 
-        <div id="view-chat" style="display: none;">
+        <!-- VIEW 3.0: RUANG CHAT / PESAN DENGAN FITUR LENGKAP (HAPUS, EDIT, DLL) -->
+        <div id="view-chat" style="display: none;" class="fade-in-view">
             <button class="nav-btn" style="width: fit-content; margin-bottom: 16px;" onclick="showView('view-user')">
-                <i data-lucide="arrow-left" size="14"></i> Kembali
+                <i data-lucide="arrow-left" size="14"></i> Kembali ke Katalog
             </button>
             <div class="panel-box">
-                <h2><i data-lucide="message-square" size="16"></i> DM Live Chat dengan Admin Fadli Kicks</h2>
+                <h2><i data-lucide="message-square" size="16"></i> Pesan & Live Chat Saling Terhubung dengan Admin</h2>
                 <div class="chat-box-container">
                     <div class="chat-messages" id="customerChatMessages"></div>
                     <div class="chat-input-row">
-                        <input type="text" id="customerChatInput" class="shop-input" placeholder="Tulis pesan atau tanya stok sepatu..." onkeypress="if(event.key==='Enter') sendCustomerChat()">
-                        <button class="btn-main" style="width:90px; margin-top:0;" onclick="sendCustomerChat()">Kirim</button>
+                        <input type="hidden" id="editingChatId" value="">
+                        <input type="text" id="customerChatInput" class="shop-input" placeholder="Tulis atau edit pesan..." onkeypress="if(event.key==='Enter') saveOrSendCustomerChat()">
+                        <button class="btn-main" id="chatSubmitBtn" style="width:90px; margin-top:0;" onclick="saveOrSendCustomerChat()">Kirim</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="view-cart" style="display: none;">
-            <button class="nav-btn" style="width: fit-content; margin-bottom: 16px;" onclick="showView('view-user')"><i data-lucide="arrow-left" size="14"></i> Kembali</button>
+        <!-- VIEW 3.1: KERANJANG BELANJA -->
+        <div id="view-cart" style="display: none;" class="fade-in-view">
+            <button class="nav-btn" style="width: fit-content; margin-bottom: 16px;" onclick="showView('view-user')">
+                <i data-lucide="arrow-left" size="14"></i> Kembali ke Katalog
+            </button>
             <div class="panel-box">
                 <h2><i data-lucide="shopping-cart" size="16"></i> Keranjang Belanja Anda</h2>
                 <div id="cartItemsContainer"></div>
             </div>
         </div>
 
-        <div id="view-cek-pesanan" style="display: none;">
-            <button class="nav-btn" style="width: fit-content; margin-bottom: 16px;" onclick="showView('view-user')"><i data-lucide="arrow-left" size="14"></i> Kembali</button>
+        <!-- VIEW 3.2: CEK PESANAN -->
+        <div id="view-cek-pesanan" style="display: none;" class="fade-in-view">
+            <button class="nav-btn" style="width: fit-content; margin-bottom: 16px;" onclick="showView('view-user')">
+                <i data-lucide="arrow-left" size="14"></i> Kembali ke Katalog
+            </button>
             <div class="panel-box">
-                <h2><i data-lucide="truck" size="16"></i> Status Perjalanan Pesanan Anda</h2>
+                <h2><i data-lucide="truck" size="16"></i> Daftar Riwayat Pesanan Sepatu</h2>
                 <div id="cekPesananResultContainer"></div>
             </div>
         </div>
 
-        <div id="view-detail" style="display: none;">
-            <button class="nav-btn" style="width: fit-content; margin-bottom: 16px;" onclick="showView('view-user')"><i data-lucide="arrow-left" size="14"></i> Kembali</button>
-            <div id="detailContentContainer"></div>
+        <!-- VIEW 3.5: DETAIL BARANG -->
+        <div id="view-detail" style="display: none;" class="fade-in-view">
+            <button class="nav-btn" style="width: fit-content; margin-bottom: 16px;" onclick="showView('view-user')">
+                <i data-lucide="arrow-left" size="14"></i> Kembali ke Katalog
+            </button>
+            <div class="detail-container" id="detailContentContainer"></div>
         </div>
 
-        <div id="view-checkout" style="display: none;">
-            <button class="nav-btn" style="width: fit-content; margin-bottom: 16px;" onclick="showView('view-cart')"><i data-lucide="arrow-left" size="14"></i> Kembali</button>
+        <!-- VIEW 4: CHECKOUT -->
+        <div id="view-checkout" style="display: none;" class="fade-in-view">
+            <button class="nav-btn" style="width: fit-content; margin-bottom: 16px;" onclick="showView('view-cart')">
+                <i data-lucide="arrow-left" size="14"></i> Kembali ke Keranjang
+            </button>
             <div class="panel-box">
-                <h2><i data-lucide="shopping-cart" size="16"></i> Form Checkout Pembelian</h2>
-                <div id="checkoutSummary" style="margin-bottom:14px; font-weight:700;"></div>
+                <h2><i data-lucide="shopping-cart" size="16"></i> Form Checkout Pembelian Sepatu</h2>
+                <div class="checkout-box" id="checkoutSummary"></div>
                 <form id="checkoutForm" onsubmit="submitOrder(event)">
-                    <div style="margin-bottom:10px;"><label style="font-size:11px; font-weight:700; color:var(--text-muted)">NAMA PENERIMA</label><input type="text" id="bName" class="shop-input" required></div>
-                    <div style="margin-bottom:10px;"><label style="font-size:11px; font-weight:700; color:var(--text-muted)">NOMOR WHATSAPP</label><input type="text" id="bPhone" class="shop-input" required></div>
-                    <div style="margin-bottom:10px;"><label style="font-size:11px; font-weight:700; color:var(--text-muted)">ALAMAT LENGKAP</label><textarea id="bAddress" class="shop-input" rows="3" required></textarea></div>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label>Nama Lengkap Penerima</label>
+                            <input type="text" id="bName" class="shop-input" required placeholder="Nama Anda...">
+                        </div>
+                        <div class="input-group">
+                            <label>Nomor WhatsApp</label>
+                            <input type="tel" id="bPhone" class="shop-input" required placeholder="081234567890">
+                        </div>
+                    </div>
+                    <div class="input-group full">
+                        <label>Alamat Pengiriman Lengkap</label>
+                        <textarea id="bAddress" class="shop-input" rows="3" required placeholder="Jalan, No Rumah, Kota..."></textarea>
+                    </div>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label>Pilih Ukuran (Size)</label>
+                            <select id="bSize" class="shop-input" required>
+                                <option value="">-- Pilih Ukuran --</option>
+                                <option value="39">Size 39</option>
+                                <option value="40">Size 40</option>
+                                <option value="41">Size 41</option>
+                                <option value="42">Size 42</option>
+                                <option value="43">Size 43</option>
+                                <option value="44">Size 44</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Metode Pembayaran</label>
+                            <select class="shop-input" required>
+                                <option value="">-- Pilih Pembayaran --</option>
+                                <option value="transfer">Transfer Bank</option>
+                                <option value="qris">QRIS Instant</option>
+                                <option value="cod">Bayar di Tempat (COD)</option>
+                            </select>
+                        </div>
+                    </div>
                     <button type="submit" class="btn-main">Kirim Pesanan Sekarang</button>
                 </form>
-                <div id="orderSuccessBox" style="display:none; text-align:center; padding:20px;">
-                    <h3 style="color:var(--primary); margin-bottom:6px;">Pesanan Berhasil Dibuat!</h3>
-                    <p style="font-size:12px; color:var(--text-muted);">Nomor Referensi: <strong id="refId"></strong></p>
+
+                <div id="orderSuccessBox" style="display:none; text-align:center; padding: 20px;" class="fade-in-view">
+                    <i data-lucide="check-circle-2" size="40" style="color:var(--accent); margin-bottom:10px;"></i>
+                    <h3 style="margin-bottom:6px;">Pesanan Sepatu Berhasil!</h3>
+                    <p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">Nomor Referensi Anda: <strong id="refId" style="color:var(--text-main);"></strong></p>
+                    <button class="btn-main" onclick="showView('view-user')">Kembali ke Katalog</button>
                 </div>
             </div>
         </div>
@@ -204,87 +991,565 @@
     <script>
         let db;
         let products = [];
-        let cart = [];
+        let suppliers = [];
         let orders = [];
+        let cart = [];
         let chatMessages = [];
         let activeCategory = 'All';
-        let selectedProduct = null;
-        let isDarkMode = false;
+        let selectedSize = '42';
+
+        let lightboxImages = [];
+        let lightboxCurrentIdx = 0;
+
+        let defaultSuppliers = [
+            { id: 1, name: "PT Indosole Jaya", contact: "081298765432" },
+            { id: 2, name: "Sneaker Master Indo", contact: "085612345678" }
+        ];
+
+        let defaultProducts = [
+            { 
+                id: 1, 
+                name: "Nike Air Jordan High Hyper Red", 
+                price: 2450000, 
+                category: "Basketball",
+                stock: 12,
+                supplier: "PT Indosole Jaya",
+                desc: "Sepatu Nike legendaris edisi khusus dengan material kulit terbaik dan bantalan udara empuk.", 
+                img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
+                images: [
+                    "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop",
+                    "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?q=80&w=1000&auto=format&fit=crop"
+                ]
+            },
+            { 
+                id: 2, 
+                name: "Nike Velocity Red Fire Runner", 
+                price: 1850000, 
+                category: "Running",
+                stock: 10,
+                supplier: "PT Indosole Jaya",
+                desc: "Sepatu lari berteknologi tinggi Nike dengan sirkulasi udara maksimal. Tersedia size 40, 41, 42, 43.", 
+                img: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?q=80&w=1000&auto=format&fit=crop",
+                images: ["https://images.unsplash.com/photo-1518091043644-c1d4457512c6?q=80&w=1000&auto=format&fit=crop"]
+            },
+            { 
+                id: 3, 
+                name: "Urban Street High-Top", 
+                price: 2100000, 
+                category: "Streetwear",
+                stock: 10,
+                supplier: "Sneaker Master Indo",
+                desc: "Gaya kasual streetwear kekinian bahan premium leather. Tersedia size 41, 42, 43, 44.", 
+                img: "https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=1000&auto=format&fit=crop",
+                images: ["https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=1000&auto=format&fit=crop"]
+            }
+        ];
+
+        let defaultOrders = [
+            {
+                id: 849201,
+                product: "Nike Air Jordan High Hyper Red",
+                price: 2450000,
+                size: "42",
+                name: "Budi Santoso",
+                phone: "08123456789",
+                address: "Jl. Pemuda No. 45, Semarang",
+                status: "Menunggu Konfirmasi",
+                time: "19 Agustus 2026, 09:15"
+            }
+        ];
+
+        let defaultChats = [
+            { id: 1, sender: 'customer', text: 'Halo Admin, apakah stok sepatu Nike Air Jordan size 42 ready?', time: '09:00' },
+            { id: 2, sender: 'admin', text: 'Halo Kak! Stok ready silakan langsung diorder ya.', time: '09:02' }
+        ];
 
         function initDB() {
-            return new Promise((resolve) => {
-                const request = indexedDB.open("FadliKicksEstheticDB", 10);
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open("FadliSneakerVaultDB", 15);
+                request.onerror = event => reject(event);
+                request.onupgradeneeded = event => {
+                    const database = event.target.result;
+                    if(!database.objectStoreNames.contains("products")) database.createObjectStore("products", { keyPath: "id" });
+                    if(!database.objectStoreNames.contains("suppliers")) database.createObjectStore("suppliers", { keyPath: "id" });
+                    if(!database.objectStoreNames.contains("orders")) database.createObjectStore("orders", { keyPath: "id" });
+                    if(!database.objectStoreNames.contains("cart")) database.createObjectStore("cart", { keyPath: "id", autoIncrement: true });
+                    if(!database.objectStoreNames.contains("chats")) database.createObjectStore("chats", { keyPath: "id", autoIncrement: true });
+                };
                 request.onsuccess = event => {
                     db = event.target.result;
-                    loadCustomerData().then(resolve);
+                    loadAllData().then(resolve);
                 };
             });
         }
 
-        function loadCustomerData() {
+        function loadAllData() {
             return new Promise((resolve) => {
-                const tx = db.transaction(["products", "cart", "orders", "chats"], "readonly");
-                tx.objectStore("products").getAll().onsuccess = e => { products = e.target.result || []; renderCatalog(); };
-                tx.objectStore("cart").getAll().onsuccess = e => { cart = e.target.result || []; updateCartBadge(); };
-                tx.objectStore("orders").getAll().onsuccess = e => { orders = e.target.result || []; };
-                tx.objectStore("chats").getAll().onsuccess = e => {
-                    chatMessages = e.target.result || [];
-                    updateFloatingBadge();
-                    if(document.getElementById('view-chat').style.display === 'block') renderCustomerChatUI();
+                const transaction = db.transaction(["products", "suppliers", "orders", "cart", "chats"], "readonly");
+                
+                transaction.objectStore("products").getAll().onsuccess = e => {
+                    const res = e.target.result;
+                    products = (res && res.length > 0) ? res : defaultProducts;
+                    if(!res || res.length === 0) saveInitialData("products", defaultProducts);
+                };
+
+                transaction.objectStore("suppliers").getAll().onsuccess = e => {
+                    const res = e.target.result;
+                    suppliers = (res && res.length > 0) ? res : defaultSuppliers;
+                    if(!res || res.length === 0) saveInitialData("suppliers", defaultSuppliers);
+                };
+
+                transaction.objectStore("orders").getAll().onsuccess = e => {
+                    const res = e.target.result;
+                    orders = (res && res.length > 0) ? res : defaultOrders;
+                    if(!res || res.length === 0) saveInitialData("orders", defaultOrders);
+                };
+
+                transaction.objectStore("cart").getAll().onsuccess = e => {
+                    cart = e.target.result || [];
+                    updateCartBadge();
+                };
+
+                transaction.objectStore("chats").getAll().onsuccess = e => {
+                    const res = e.target.result;
+                    chatMessages = (res && res.length > 0) ? res : defaultChats;
+                    if(!res || res.length === 0) saveInitialData("chats", defaultChats);
                     resolve();
                 };
             });
         }
 
+        function saveInitialData(storeName, dataArray) {
+            const tx = db.transaction(storeName, "readwrite");
+            const store = tx.objectStore(storeName);
+            dataArray.forEach(item => store.put(item));
+        }
+
         function saveDataToStore(storeName, itemObj) {
-            return new Promise((resolve) => {
+            return new Promise((resolve, reject) => {
                 const tx = db.transaction(storeName, "readwrite");
                 const store = tx.objectStore(storeName);
                 const req = store.put(itemObj);
                 req.onsuccess = () => resolve();
+                req.onerror = err => reject(err);
             });
         }
 
         function deleteDataFromStore(storeName, id) {
-            return new Promise((resolve) => {
+            return new Promise((resolve, reject) => {
                 const tx = db.transaction(storeName, "readwrite");
                 const store = tx.objectStore(storeName);
                 const req = store.delete(id);
                 req.onsuccess = () => resolve();
+                req.onerror = err => reject(err);
             });
         }
 
-        setInterval(() => { if(db) loadCustomerData(); }, 1500);
+        let selectedProduct = null;
+        let sliderInterval = null;
+        let currentSlideIdx = 0;
+
+        async function init() {
+            lucide.createIcons();
+            await initDB();
+            startFlashSaleTimer();
+            showView('view-login');
+        }
+
+        function updateCartBadge() {
+            const badge = document.getElementById('cartBadgeCount');
+            if(badge) badge.innerText = cart.length;
+        }
+
+        function startFlashSaleTimer() {
+            let totalSeconds = 4 * 3600 + 58 * 60 + 32;
+            setInterval(() => {
+                if(totalSeconds > 0) totalSeconds--;
+                let h = Math.floor(totalSeconds / 3600);
+                let m = Math.floor((totalSeconds % 3600) / 60);
+                let s = totalSeconds % 60;
+                const timerEl = document.getElementById('flashCountdown');
+                if(timerEl) {
+                    timerEl.innerText = `${String(h).padStart(2,'0')} : ${String(m).padStart(2,'0')} : ${String(s).padStart(2,'0')}`;
+                }
+            }, 1000);
+        }
 
         function showToast(msg) {
             const container = document.getElementById('toast-container');
             const t = document.createElement('div');
             t.className = 'toast-item';
-            t.innerText = msg;
+            t.innerHTML = `<i data-lucide="check-circle" size="16" style="color:var(--accent);"></i> <span>${msg}</span>`;
             container.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
+            lucide.createIcons({targets: [t]});
+            setTimeout(() => t.classList.add('show'), 10);
+            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
+        }
+
+        function openLightbox(imagesInput, startIndex = 0) {
+            lightboxImages = Array.isArray(imagesInput) ? imagesInput : [imagesInput];
+            lightboxCurrentIdx = startIndex;
+
+            const track = document.getElementById('lightboxSliderTrack');
+            track.innerHTML = '';
+
+            lightboxImages.forEach(imgUrl => {
+                const slide = document.createElement('div');
+                slide.className = 'lightbox-slide';
+                slide.innerHTML = `<img src="${imgUrl}">`;
+                track.appendChild(slide);
+            });
+
+            updateLightboxView();
+            document.getElementById('mediaLightbox').classList.add('active');
+        }
+
+        function slideLightbox(direction) {
+            lightboxCurrentIdx += direction;
+            if (lightboxCurrentIdx < 0) {
+                lightboxCurrentIdx = lightboxImages.length - 1;
+            } else if (lightboxCurrentIdx >= lightboxImages.length) {
+                lightboxCurrentIdx = 0;
+            }
+            updateLightboxView();
+        }
+
+        function updateLightboxView() {
+            const track = document.getElementById('lightboxSliderTrack');
+            track.style.transform = `translateX(-${lightboxCurrentIdx * 100}%)`;
+
+            const counter = document.getElementById('lightboxCounter');
+            const prevBtn = document.getElementById('lightboxPrevBtn');
+            const nextBtn = document.getElementById('lightboxNextBtn');
+
+            if (lightboxImages.length > 1) {
+                counter.style.display = 'block';
+                prevBtn.style.display = 'flex';
+                nextBtn.style.display = 'flex';
+                counter.innerText = `${lightboxCurrentIdx + 1} / ${lightboxImages.length}`;
+            } else {
+                counter.style.display = 'none';
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+            }
+        }
+
+        function closeLightbox() {
+            document.getElementById('mediaLightbox').classList.remove('active');
+            document.getElementById('lightboxSliderTrack').innerHTML = '';
+        }
+
+        function initSlider() {
+            if(sliderInterval) clearInterval(sliderInterval);
+            sliderInterval = setInterval(() => { nextSlide(); }, 3800);
+        }
+
+        function nextSlide() {
+            const slides = document.querySelectorAll('.slide-item');
+            const dots = document.querySelectorAll('.dot');
+            if(slides.length === 0) return;
+            
+            slides[currentSlideIdx].classList.remove('active');
+            slides[currentSlideIdx].classList.add('exit-right');
+            dots[currentSlideIdx].classList.remove('active');
+            
+            let prevIdx = currentSlideIdx;
+            currentSlideIdx = (currentSlideIdx + 1) % slides.length;
+            
+            setTimeout(() => {
+                slides[prevIdx].classList.remove('exit-right');
+            }, 900);
+
+            slides[currentSlideIdx].classList.add('active');
+            dots[currentSlideIdx].classList.add('active');
+        }
+
+        function currentSlide(n) {
+            const slides = document.querySelectorAll('.slide-item');
+            const dots = document.querySelectorAll('.dot');
+            if(slides.length === 0 || n === currentSlideIdx) return;
+            
+            slides[currentSlideIdx].classList.remove('active');
+            slides[currentSlideIdx].classList.add('exit-right');
+            dots[currentSlideIdx].classList.remove('active');
+            
+            let prevIdx = currentSlideIdx;
+            currentSlideIdx = n;
+            
+            setTimeout(() => {
+                slides[prevIdx].classList.remove('exit-right');
+            }, 900);
+
+            slides[currentSlideIdx].classList.add('active');
+            dots[currentSlideIdx].classList.add('active');
+            
+            if(sliderInterval) { clearInterval(sliderInterval); initSlider(); }
+        }
+
+        function triggerTransition(nextView) {
+            const curtain = document.getElementById('login-transition-curtain');
+            curtain.classList.add('animating');
+            setTimeout(() => {
+                document.getElementById('navbar').style.display = 'flex';
+                showView(nextView);
+                if(nextView === 'view-admin') { refreshAdminPanel(); }
+                if(nextView === 'view-user') { renderCatalog(); setTimeout(initSlider, 100); }
+            }, 350);
+            setTimeout(() => curtain.classList.remove('animating'), 750);
+        }
+
+        function showView(viewId) {
+            ['view-login', 'view-admin', 'view-user', 'view-chat', 'view-cart', 'view-detail', 'view-checkout', 'view-cek-pesanan'].forEach(id => {
+                document.getElementById(id).style.display = (id === viewId) ? (id === 'view-login' ? 'flex' : 'block') : 'none';
+            });
+            if(viewId === 'view-login') document.getElementById('navbar').style.display = 'none';
+            if(viewId !== 'view-user' && sliderInterval) clearInterval(sliderInterval);
+            window.scrollTo({top:0, behavior:'smooth'});
+        }
+
+        function goHome() {
+            showView('view-user');
+            setTimeout(initSlider, 100);
+        }
+
+        function openAdminModal() { document.getElementById('adminModal').classList.add('active'); }
+        function closeModal() { document.getElementById('adminModal').classList.remove('active'); }
+
+        function verifyAdmin() {
+            const pass = document.getElementById('adminPass').value;
+            if(pass === 'admin123') {
+                closeModal();
+                triggerTransition('view-admin');
+                showToast("Akses Eksekutif Admin Diberikan");
+            } else {
+                showToast("Password Salah!");
+            }
+        }
+
+        function loginAsUser() {
+            triggerTransition('view-user');
+            showToast("Selamat Datang di Fadli's Sneaker Vault");
+        }
+
+        function logout() {
+            document.getElementById('navbar').style.display = 'none';
+            showView('view-login');
+            showToast("Berhasil Keluar");
         }
 
         function formatRupiah(num) {
             return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
         }
 
-        function toggleTheme() {
-            isDarkMode = !isDarkMode;
-            document.body.classList.toggle('dark-mode', isDarkMode);
-            document.getElementById('themeIcon').setAttribute('data-lucide', isDarkMode ? 'sun-medium' : 'moon');
+        function refreshAdminPanel() {
+            renderAdminSuppliers();
+            populateSupplierDropdown();
+            renderAdminProducts();
+            renderAdminOrders();
+            renderAdminChatPanel();
+        }
+
+        async function saveSupplier(e) {
+            e.preventDefault();
+            const name = document.getElementById('sName').value;
+            const contact = document.getElementById('sContact').value;
+            const newSup = { id: Date.now(), name, contact };
+            
+            suppliers.push(newSup);
+            await saveDataToStore("suppliers", newSup);
+            document.getElementById('supplierForm').reset();
+            refreshAdminPanel();
+            showToast("Supplier Berhasil Ditambahkan");
+        }
+
+        async function deleteSupplier(id) {
+            if(confirm("Hapus supplier ini?")) {
+                suppliers = suppliers.filter(s => s.id !== Number(id));
+                await deleteDataFromStore("suppliers", Number(id));
+                refreshAdminPanel();
+                showToast("Supplier Dihapus");
+            }
+        }
+
+        function renderAdminSuppliers() {
+            const container = document.getElementById('adminSupplierList');
+            container.innerHTML = '';
+            if(suppliers.length === 0) {
+                container.innerHTML = `<p style="font-size:11px; color:var(--text-muted); text-align:center;">Belum ada supplier.</p>`;
+                return;
+            }
+            suppliers.forEach(s => {
+                const item = document.createElement('div');
+                item.className = 'admin-item';
+                item.innerHTML = `
+                    <div>
+                        <div style="font-weight:700; font-size:12px;">${s.name}</div>
+                        <div style="font-size:10px; color:var(--text-muted);">Kontak: ${s.contact}</div>
+                    </div>
+                    <button class="btn-sm btn-del" onclick="deleteSupplier(${s.id})">Hapus</button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function populateSupplierDropdown() {
+            const select = document.getElementById('pSupplier');
+            select.innerHTML = `<option value="">-- Pilih Supplier --</option>`;
+            suppliers.forEach(s => {
+                select.innerHTML += `<option value="${s.name}">${s.name}</option>`;
+            });
+        }
+
+        function fileToDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = err => reject(err);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function addMorePhotoInput() {
+            const container = document.getElementById('extraPhotoContainer');
+            const count = container.children.length + 3;
+            const div = document.createElement('div');
+            div.className = 'input-group full';
+            div.innerHTML = `
+                <label>Upload Foto Tambahan ${count}</label>
+                <input type="file" class="shop-file extra-photo-input" accept="image/*">
+            `;
+            container.appendChild(div);
             lucide.createIcons();
         }
 
-        function showView(viewId) {
-            ['view-user', 'view-chat', 'view-cart', 'view-cek-pesanan', 'view-detail', 'view-checkout'].forEach(id => {
-                document.getElementById(id).style.display = (id === viewId) ? 'block' : 'none';
-            });
-            window.scrollTo({top:0, behavior:'smooth'});
+        async function saveProduct(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editIndex').value;
+            const name = document.getElementById('pName').value;
+            const price = Number(document.getElementById('pPrice').value);
+            const category = document.getElementById('pCategory').value;
+            const stock = Number(document.getElementById('pStock').value);
+            const supplier = document.getElementById('pSupplier').value;
+            const desc = document.getElementById('pDesc').value;
+            
+            const imgFile = document.getElementById('pImgFile').files[0];
+            const imgFile2 = document.getElementById('pImgFile2').files[0];
+            const extraInputs = document.querySelectorAll('.extra-photo-input');
+
+            let imagesArray = [];
+            let defaultImg = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop";
+
+            if(editId !== "") {
+                const existing = products.find(p => p.id === Number(editId));
+                if(existing) {
+                    defaultImg = existing.img;
+                    imagesArray = existing.images || [existing.img];
+                }
+            }
+
+            if(imgFile) {
+                const url1 = await fileToDataUrl(imgFile);
+                defaultImg = url1;
+                imagesArray.unshift(url1);
+            }
+
+            if(imgFile2) {
+                const url2 = await fileToDataUrl(imgFile2);
+                imagesArray.push(url2);
+            }
+
+            for(let input of extraInputs) {
+                if(input.files[0]) {
+                    const extraUrl = await fileToDataUrl(input.files[0]);
+                    imagesArray.push(extraUrl);
+                }
+            }
+
+            if(imagesArray.length === 0) imagesArray = [defaultImg];
+
+            const productId = editId !== "" ? Number(editId) : Date.now();
+            const newProd = { id: productId, name, price, category, stock, supplier, desc, img: defaultImg, images: imagesArray };
+
+            if(editId !== "") {
+                const idx = products.findIndex(p => p.id === productId);
+                if(idx !== -1) products[idx] = newProd;
+                showToast("Data & Stok Sepatu Diperbarui");
+                resetForm();
+            } else {
+                products.unshift(newProd);
+                showToast("Sepatu Baru & Stok Ditambahkan");
+                document.getElementById('productForm').reset();
+                document.getElementById('extraPhotoContainer').innerHTML = '';
+            }
+
+            await saveDataToStore("products", newProd);
+            refreshAdminPanel();
         }
 
-        function updateCartBadge() { document.getElementById('cartBadgeCount').innerText = cart.length; }
-        function updateFloatingBadge() { document.getElementById('floatingChatBadge').innerText = chatMessages.length; }
+        function renderAdminProducts() {
+            const containerList = document.getElementById('adminPriceListView');
+            containerList.innerHTML = '';
+            if(products.length === 0) {
+                containerList.innerHTML = `<p style="font-size:11px; color:var(--text-muted); text-align:center;">Belum ada data barang.</p>`;
+                return;
+            }
+            products.forEach(p => {
+                const pImages = (p.images && p.images.length > 0) ? p.images : [p.img];
+                const item = document.createElement('div');
+                item.className = 'admin-item';
+                item.innerHTML = `
+                    <div class="admin-item-info">
+                        <img src="${p.img}" class="admin-item-img" onclick="openLightbox(${JSON.stringify(pImages).replace(/"/g, '&quot;')}, 0)" title="Klik foto">
+                        <div>
+                            <div style="font-weight:700; font-size:12px;">${p.name}</div>
+                            <div style="font-size:11px; color:var(--text-main); font-weight:700;">${formatRupiah(p.price)} <span style="color:var(--text-muted); font-weight:normal;">| Stok: <b>${p.stock !== undefined ? p.stock : 10}</b></span></div>
+                        </div>
+                    </div>
+                    <div class="admin-actions">
+                        <button class="btn-sm btn-edit" onclick="editProduct(${p.id})">Edit</button>
+                        <button class="btn-sm btn-del" onclick="deleteProduct(${p.id})">Hapus</button>
+                    </div>
+                `;
+                containerList.appendChild(item);
+            });
+        }
+
+        function editProduct(id) {
+            const p = products.find(prod => prod.id === Number(id));
+            if(!p) return;
+            document.getElementById('editIndex').value = p.id;
+            document.getElementById('pName').value = p.name;
+            document.getElementById('pPrice').value = p.price;
+            document.getElementById('pCategory').value = p.category || 'Running';
+            document.getElementById('pStock').value = p.stock !== undefined ? p.stock : 10;
+            document.getElementById('pSupplier').value = p.supplier;
+            document.getElementById('pDesc').value = p.desc;
+            document.getElementById('extraPhotoContainer').innerHTML = '';
+            document.getElementById('formTitle').innerHTML = `<i data-lucide="edit-3" size="16"></i> Edit Data & Stok Sepatu`;
+            document.getElementById('btnSubmitProd').innerText = "Simpan Perubahan";
+            document.getElementById('btnCancel').style.display = "block";
+            window.scrollTo({top:0, behavior:'smooth'});
+            lucide.createIcons();
+        }
+
+        function resetForm() {
+            document.getElementById('editIndex').value = "";
+            document.getElementById('productForm').reset();
+            document.getElementById('extraPhotoContainer').innerHTML = '';
+            document.getElementById('formTitle').innerHTML = `<i data-lucide="plus-circle" size="16"></i> Input & Edit Barang & Stok Sepatu`;
+            document.getElementById('btnSubmitProd').innerText = "Simpan Data & Stok Sepatu";
+            document.getElementById('btnCancel').style.display = "none";
+            lucide.createIcons();
+        }
+
+        async function deleteProduct(id) {
+            if(confirm("Hapus sepatu ini dari katalog?")) {
+                products = products.filter(p => p.id !== Number(id));
+                await deleteDataFromStore("products", Number(id));
+                refreshAdminPanel();
+                showToast("Sepatu Dihapus");
+            }
+        }
 
         function filterCategory(cat, el) {
             activeCategory = cat;
@@ -297,144 +1562,516 @@
             const grid = document.getElementById('catalogGrid');
             const keyword = document.getElementById('searchKeyword').value.toLowerCase();
             grid.innerHTML = '';
-            const filtered = products.filter(p => p.name.toLowerCase().includes(keyword) && (activeCategory === 'All' || p.category === activeCategory));
+
+            const filtered = products.filter(p => {
+                const matchName = p.name.toLowerCase().includes(keyword);
+                const matchCat = activeCategory === 'All' || (p.category && p.category === activeCategory);
+                return matchName && matchCat;
+            });
+
             if(filtered.length === 0) {
-                grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:30px; color:var(--text-muted);">Belum ada produk sepatu.</div>`;
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--text-muted);">Sepatu tidak ditemukan</div>`;
                 return;
             }
+
             filtered.forEach(p => {
-                grid.innerHTML += `<div class="product-card" onclick="openDetail(${p.id})"><div class="product-media-wrap"><img src="${p.img}" class="product-img"></div><div class="product-body"><div class="product-title">${p.name}</div><div class="product-price">${formatRupiah(p.price)}</div><button class="btn-buy">Lihat Detail</button></div></div>`;
+                const currentStock = p.stock !== undefined ? p.stock : 10;
+                const isHabis = currentStock <= 0;
+                const pImages = (p.images && p.images.length > 0) ? p.images : [p.img];
+
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.onclick = () => openDetail(p.id);
+                card.innerHTML = `
+                    <div class="product-media-wrap" onclick="event.stopPropagation(); openLightbox(${JSON.stringify(pImages).replace(/"/g, '&quot;')}, 0)">
+                        <span class="badge-pro">${p.category || 'Original'}</span>
+                        <span class="badge-stock ${isHabis ? 'habis' : ''}">${isHabis ? 'Stok Habis' : 'Stok: ' + currentStock}</span>
+                        <img src="${p.img}" class="product-img" alt="${p.name}">
+                    </div>
+                    <div class="product-body">
+                        <div class="product-title">${p.name}</div>
+                        <div class="product-price-box">
+                            <div class="product-price">${formatRupiah(p.price)}</div>
+                        </div>
+                        <div class="product-desc">${p.desc}</div>
+                        <button class="btn-buy">
+                            <i data-lucide="eye" size="13"></i> Lihat Detail & Beli
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
             });
             lucide.createIcons();
+        }
+
+        function selectSize(sizeEl, sizeVal) {
+            document.querySelectorAll('.size-pill').forEach(p => p.classList.remove('active'));
+            sizeEl.classList.add('active');
+            selectedSize = sizeVal;
+        }
+
+        function changeMainImage(imgUrl, thumbEl, imagesArr, index) {
+            const mainImg = document.getElementById('detailMainImage');
+            if(mainImg.src === imgUrl) return;
+
+            mainImg.classList.add('animating');
+            setTimeout(() => {
+                mainImg.src = imgUrl;
+                mainImg.onclick = () => openLightbox(imagesArr, index);
+                mainImg.classList.remove('animating');
+            }, 180);
+
+            document.querySelectorAll('.detail-thumb-img').forEach(t => t.classList.remove('active'));
+            thumbEl.classList.add('active');
         }
 
         function openDetail(id) {
             const p = products.find(prod => prod.id === Number(id));
             if(!p) return;
             selectedProduct = p;
-            document.getElementById('detailContentContainer').innerHTML = `<div class="panel-box"><h2>${p.name}</h2><img src="${p.img}" style="width:100%; max-height:300px; object-fit:cover; border-radius:12px; margin-bottom:12px;"><div style="color:var(--primary); font-weight:800; font-size:18px; margin-bottom:8px;">${formatRupiah(p.price)}</div><p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">${p.desc}</p><button class="btn-main" onclick="addToCart(${p.id})">Masukkan ke Keranjang</button><button class="btn-dm" onclick="openCustomerChatWithProduct('${p.name}')"><i data-lucide="message-square" size="14"></i> Tanya via DM Chat</button></div>`;
+            selectedSize = '42';
+
+            const currentStock = p.stock !== undefined ? p.stock : 10;
+            const imagesList = (p.images && p.images.length > 0) ? p.images : [p.img];
+            let thumbsHtml = '';
+            imagesList.forEach((imgSrc, idx) => {
+                thumbsHtml += `<img src="${imgSrc}" class="detail-thumb-img ${idx === 0 ? 'active' : ''}" onclick="changeMainImage('${imgSrc}', this, ${JSON.stringify(imagesList).replace(/"/g, '&quot;')}, ${idx})">`;
+            });
+
+            const container = document.getElementById('detailContentContainer');
+            container.innerHTML = `
+                <div class="detail-gallery">
+                    <img src="${imagesList[0]}" class="detail-main-img" id="detailMainImage" onclick="openLightbox(${JSON.stringify(imagesList).replace(/"/g, '&quot;')}, 0)" title="Klik memperbesar">
+                    <div class="detail-thumbs">${thumbsHtml}</div>
+                </div>
+                <div class="detail-info-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                        <span class="slide-badge" style="width:fit-content;">Supplier: ${p.supplier}</span>
+                        <span style="font-size:11px; font-weight:700; color:${currentStock > 0 ? '#10b981' : '#ef4444'};">
+                            Stok Tersedia: <b>${currentStock} Unit</b>
+                        </span>
+                    </div>
+                    
+                    <h1 class="detail-title">${p.name}</h1>
+                    <div class="detail-price">${formatRupiah(p.price)}</div>
+                    <p class="detail-desc-text">${p.desc}</p>
+                    
+                    <div class="size-selector-box">
+                        <label style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Pilih Ukuran (Size):</label>
+                        <div class="size-options">
+                            <div class="size-pill" onclick="selectSize(this, '39')">39</div>
+                            <div class="size-pill" onclick="selectSize(this, '40')">40</div>
+                            <div class="size-pill" onclick="selectSize(this, '41')">41</div>
+                            <div class="size-pill active" onclick="selectSize(this, '42')">42</div>
+                            <div class="size-pill" onclick="selectSize(this, '43')">43</div>
+                            <div class="size-pill" onclick="selectSize(this, '44')">44</div>
+                        </div>
+                    </div>
+
+                    <div class="spec-features">
+                        <div class="spec-item"><i data-lucide="check-circle-2" size="14" style="color:var(--text-main);"></i> Dijamin 100% Original & Berkualitas</div>
+                        <div class="spec-item"><i data-lucide="truck" size="14" style="color:var(--text-main);"></i> Pengiriman Kilat ke Seluruh Indonesia</div>
+                        <div class="spec-item"><i data-lucide="shield-check" size="14" style="color:var(--text-main);"></i> Garansi Retur Ukuran 7 Hari</div>
+                    </div>
+
+                    ${currentStock > 0 ? `
+                        <button class="btn-main" onclick="addToCart(${p.id})">
+                            <i data-lucide="shopping-cart" size="15"></i> Masukkan ke Keranjang
+                        </button>
+                        <button class="btn-secondary" onclick="goToCheckoutDirect(${p.id})">
+                            <i data-lucide="zap" size="15"></i> Beli Sekarang (Checkout Langsung)
+                        </button>
+                    ` : `
+                        <button class="btn-main" style="background:#cbd5e1; cursor:not-allowed;" disabled>Stok Habis</button>
+                    `}
+
+                    <button class="btn-dm" onclick="openCustomerChat('${p.name}')">
+                        <i data-lucide="message-square" size="15"></i> Kirim Pesan ke Admin
+                    </button>
+                </div>
+            `;
             showView('view-detail');
             lucide.createIcons();
         }
 
+        function openCustomerChat(prodName) {
+            renderCustomerChatUI();
+            if(prodName) {
+                const initialText = `Halo Admin, saya ingin tanya ketersediaan stok produk: ${prodName} (Size ${selectedSize}). Apakah ready?`;
+                appendAndSaveChat('customer', initialText);
+            }
+            showView('view-chat');
+        }
+
+        function renderCustomerChatUI() {
+            const container = document.getElementById('customerChatMessages');
+            container.innerHTML = '';
+            chatMessages.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = `chat-msg ${msg.sender}`;
+                
+                let actionsHtml = '';
+                if(msg.sender === 'customer') {
+                    actionsHtml = `
+                        <div class="chat-msg-actions">
+                            <button class="chat-action-btn" onclick="editChatMessage(${msg.id})">Edit</button>
+                            <button class="chat-action-btn" onclick="deleteChatMessage(${msg.id})">Hapus</button>
+                        </div>
+                    `;
+                }
+
+                div.innerHTML = `<div>${msg.text}</div>${actionsHtml}<div style="font-size:9px; opacity:0.7; margin-top:2px; text-align:right;">${msg.time}</div>`;
+                container.appendChild(div);
+            });
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function saveOrSendCustomerChat() {
+            const input = document.getElementById('customerChatInput');
+            const editingId = document.getElementById('editingChatId').value;
+            const val = input.value.trim();
+            if(!val) return;
+
+            if(editingId !== "") {
+                const msgObj = chatMessages.find(m => m.id === Number(editingId));
+                if(msgObj) {
+                    msgObj.text = val;
+                    await saveDataToStore("chats", msgObj);
+                }
+                document.getElementById('editingChatId').value = "";
+                document.getElementById('chatSubmitBtn').innerText = "Kirim";
+                showToast("Pesan Berhasil Diperbarui");
+            } else {
+                const now = new Date();
+                const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+                const newMsg = { id: Date.now(), sender: 'customer', text: val, time: timeStr };
+                chatMessages.push(newMsg);
+                await saveDataToStore("chats", newMsg);
+                showToast("Pesan Terkirim");
+            }
+
+            input.value = '';
+            renderCustomerChatUI();
+        }
+
+        function editChatMessage(id) {
+            const msg = chatMessages.find(m => m.id === Number(id));
+            if(!msg) return;
+            document.getElementById('customerChatInput').value = msg.text;
+            document.getElementById('editingChatId').value = msg.id;
+            document.getElementById('chatSubmitBtn').innerText = "Simpan";
+            document.getElementById('customerChatInput').focus();
+        }
+
+        async function deleteChatMessage(id) {
+            if(confirm("Hapus pesan ini?")) {
+                chatMessages = chatMessages.filter(m => m.id !== Number(id));
+                await deleteDataFromStore("chats", Number(id));
+                renderCustomerChatUI();
+                showToast("Pesan Dihapus");
+            }
+        }
+
+        function renderAdminChatPanel() {
+            const container = document.getElementById('adminChatListContainer');
+            container.innerHTML = `
+                <div class="chat-box-container" style="height: 280px;">
+                    <div class="chat-messages" id="adminChatMessagesBox"></div>
+                    <div class="chat-input-row">
+                        <input type="text" id="adminChatInput" class="shop-input" placeholder="Balas pesan pembeli..." onkeypress="if(event.key==='Enter') sendAdminChat()">
+                        <button class="btn-main" style="width:90px; margin-top:0;" onclick="sendAdminChat()">Balas</button>
+                    </div>
+                </div>
+            `;
+            renderAdminChatMessages();
+        }
+
+        function renderAdminChatMessages() {
+            const box = document.getElementById('adminChatMessagesBox');
+            if(!box) return;
+            box.innerHTML = '';
+            chatMessages.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = `chat-msg ${msg.sender === 'customer' ? 'customer' : 'admin'}`;
+                div.innerHTML = `<div><b>${msg.sender === 'customer' ? 'Pembeli' : 'Admin'}:</b> ${msg.text}</div><div style="font-size:9px; opacity:0.7; margin-top:2px; text-align:right;">${msg.time}</div>`;
+                box.appendChild(div);
+            });
+            box.scrollTop = box.scrollHeight;
+        }
+
+        async function sendAdminChat() {
+            const input = document.getElementById('adminChatInput');
+            const val = input.value.trim();
+            if(!val) return;
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            const msgObj = { id: Date.now(), sender: 'admin', text: val, time: timeStr };
+            
+            chatMessages.push(msgObj);
+            await saveDataToStore("chats", msgObj);
+            input.value = '';
+            renderAdminChatMessages();
+        }
+
+        async function appendAndSaveChat(sender, text) {
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            const msgObj = { id: Date.now(), sender, text, time: timeStr };
+            
+            chatMessages.push(msgObj);
+            await saveDataToStore("chats", msgObj);
+            
+            if(document.getElementById('view-chat').style.display === 'block') {
+                renderCustomerChatUI();
+            }
+            if(document.getElementById('view-admin').style.display === 'block') {
+                renderAdminChatMessages();
+            }
+        }
+
         async function addToCart(id) {
             const p = products.find(prod => prod.id === Number(id));
-            const item = { id: Date.now(), productId: p.id, name: p.name, price: p.price, img: p.img, size: '42' };
-            cart.push(item);
-            await saveDataToStore("cart", item);
+            if(!p) return;
+
+            const cartItem = {
+                id: Date.now(),
+                productId: p.id,
+                name: p.name,
+                price: p.price,
+                img: p.img,
+                size: selectedSize
+            };
+
+            cart.push(cartItem);
+            await saveDataToStore("cart", cartItem);
             updateCartBadge();
-            showToast("Dimasukkan ke keranjang!");
+            showToast("Produk berhasil dimasukkan ke keranjang!");
             openCartView();
         }
 
         function openCartView() {
             const container = document.getElementById('cartItemsContainer');
             container.innerHTML = '';
+
             if(cart.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted);">Keranjang kosong.</div>`;
+                container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:12px;">Keranjang belanja Anda masih kosong.</div>`;
                 showView('view-cart');
                 return;
             }
-            let total = 0;
-            cart.forEach(item => {
-                total += item.price;
-                container.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-deep); padding:10px; border-radius:10px; margin-bottom:8px;"><div style="font-size:12px; font-weight:700;">${item.name}<br><span style="color:var(--primary);">${formatRupiah(item.price)}</span></div><button style="background:none; border:none; color:red; cursor:pointer;" onclick="removeFromCart(${item.id})">Hapus</button></div>`;
+
+            let totalBelanja = 0;
+            cart.forEach((item) => {
+                totalBelanja += item.price;
+                const div = document.createElement('div');
+                div.className = 'admin-item';
+                div.innerHTML = `
+                    <div class="admin-item-info">
+                        <img src="${item.img}" class="admin-item-img" onclick="openLightbox(['${item.img}'], 0)">
+                        <div>
+                            <div style="font-weight:700; font-size:12px;">${item.name}</div>
+                            <div style="font-size:11px; color:var(--text-muted);">Size: ${item.size}</div>
+                            <div style="font-size:11px; color:var(--text-main); font-weight:800; margin-top:2px;">${formatRupiah(item.price)}</div>
+                        </div>
+                    </div>
+                    <button class="btn-sm btn-del" onclick="removeFromCart(${item.id})">Hapus</button>
+                `;
+                container.appendChild(div);
             });
-            container.innerHTML += `<button class="btn-main" onclick="setupCheckout()">Checkout Total (${formatRupiah(total)})</button>`;
+
+            const checkoutAllBtn = document.createElement('button');
+            checkoutAllBtn.className = 'btn-main';
+            checkoutAllBtn.style.marginTop = "14px";
+            checkoutAllBtn.innerHTML = `Lanjut Checkout Semua (${formatRupiah(totalBelanja)})`;
+            checkoutAllBtn.onclick = () => goToCheckoutCart(cart[0]);
+            container.appendChild(checkoutAllBtn);
+
             showView('view-cart');
+            lucide.createIcons();
         }
 
-        async function removeFromCart(id) {
-            cart = cart.filter(c => c.id !== Number(id));
-            await deleteDataFromStore("cart", Number(id));
+        async function removeFromCart(cartId) {
+            cart = cart.filter(c => c.id !== Number(cartId));
+            await deleteDataFromStore("cart", Number(cartId));
             updateCartBadge();
             openCartView();
+            showToast("Produk dihapus dari keranjang");
         }
 
-        function openCustomerChat() { renderCustomerChatUI(); showView('view-chat'); }
-        function openCustomerChatWithProduct(name) {
-            const initialText = `Halo Admin, apakah sepatu ${name} ready?`;
-            appendAndSaveChat('customer', initialText);
-            showView('view-chat');
+        function goToCheckoutDirect(id) {
+            selectedProduct = products.find(p => p.id === Number(id));
+            if(!selectedProduct) return;
+            setupCheckoutView(selectedProduct, selectedSize);
         }
 
-        function renderCustomerChatUI() {
-            const box = document.getElementById('customerChatMessages');
-            box.innerHTML = '';
-            if(chatMessages.length === 0) {
-                box.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">Mulai percakapan dengan admin toko.</div>`;
-                return;
-            }
-            chatMessages.forEach(msg => {
-                box.innerHTML += `<div class="chat-msg ${msg.sender}"><div><b>${msg.sender === 'customer' ? 'Anda' : 'Admin'}:</b> ${msg.text}</div><div style="font-size:9px; opacity:0.7; margin-top:2px; text-align:right;">${msg.time}</div></div>`;
-            });
-            box.scrollTop = box.scrollHeight;
+        function goToCheckoutCart(item) {
+            selectedProduct = products.find(p => p.id === Number(item.productId)) || { name: item.name, price: item.price, img: item.img };
+            setupCheckoutView(selectedProduct, item.size);
         }
 
-        async function sendCustomerChat() {
-            const input = document.getElementById('customerChatInput');
-            const val = input.value.trim();
-            if(!val) return;
-            await appendAndSaveChat('customer', val);
-            input.value = '';
-        }
-
-        async function appendAndSaveChat(sender, text) {
-            const now = new Date();
-            const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-            const msgObj = { sender, text, time: timeStr };
-            chatMessages.push(msgObj);
-            await saveDataToStore("chats", msgObj);
-            updateFloatingBadge();
-            renderCustomerChatUI();
-        }
-
-        function setupCheckout() {
-            document.getElementById('checkoutSummary').innerText = `Total Item di Keranjang: ${cart.length} Produk`;
+        function setupCheckoutView(prod, size) {
+            const pImages = (prod.images && prod.images.length > 0) ? prod.images : [prod.img];
+            document.getElementById('checkoutSummary').innerHTML = `
+                <img src="${prod.img}" class="checkout-img" onclick="openLightbox(${JSON.stringify(pImages).replace(/"/g, '&quot;')}, 0)">
+                <div>
+                    <h4 style="font-size:12px; font-weight:700; margin-bottom:4px;">${prod.name}</h4>
+                    <p style="color:var(--text-main); font-weight:800; font-size:12px;">${formatRupiah(prod.price)} (Size: ${size})</p>
+                </div>
+            `;
+            document.getElementById('bSize').value = size;
+            document.getElementById('checkoutForm').style.display = 'block';
+            document.getElementById('orderSuccessBox').style.display = 'none';
             showView('view-checkout');
         }
 
         async function submitOrder(e) {
             e.preventDefault();
             const now = new Date();
-            const timeString = `${now.getDate()} Mins, ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            const timeString = `${now.getDate()} ${['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][now.getMonth()]} ${now.getFullYear()}, ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+            if(selectedProduct && selectedProduct.id) {
+                const pObj = products.find(p => p.id === selectedProduct.id);
+                if(pObj) {
+                    pObj.stock = Math.max(0, (pObj.stock !== undefined ? pObj.stock : 10) - 1);
+                    await saveDataToStore("products", pObj);
+                }
+            }
+
             const newOrder = {
                 id: Math.floor(100000 + Math.random() * 900000),
-                product: cart[0] ? cart[0].name : "Paket Belanja",
-                price: cart.reduce((a,b)=>a+b.price, 0),
-                size: '42',
+                product: selectedProduct.name,
+                price: selectedProduct.price,
+                size: document.getElementById('bSize').value,
                 name: document.getElementById('bName').value,
                 phone: document.getElementById('bPhone').value,
                 address: document.getElementById('bAddress').value,
                 status: "Menunggu Konfirmasi",
                 time: timeString
             };
+            
             orders.unshift(newOrder);
             await saveDataToStore("orders", newOrder);
+
             document.getElementById('checkoutForm').style.display = 'none';
-            document.getElementById('refId').innerText = newOrder.id;
+            document.getElementById('refId').innerText = `${newOrder.id}`;
             document.getElementById('orderSuccessBox').style.display = 'block';
-            showToast("Pesanan Berhasil!");
+            showToast("Pesanan Berhasil Dibuat & Stok Diperbarui!");
         }
 
         function openCekPesanan() {
+            renderUserOrdersList();
+            showView('view-cek-pesanan');
+        }
+
+        function renderUserOrdersList() {
             const container = document.getElementById('cekPesananResultContainer');
             container.innerHTML = '';
+
             if(orders.length === 0) {
-                container.innerHTML = `<p style="font-size:12px; color:var(--text-muted); text-align:center;">Belum ada pesanan.</p>`;
-                showView('view-cek-pesanan');
+                container.innerHTML = `<p style="font-size:11px; color:var(--text-muted); text-align:center; padding:16px;">Belum ada riwayat pesanan.</p>`;
                 return;
             }
+
             const statuses = ["Menunggu Konfirmasi", "Sedang Dikemas", "Sedang Diantar", "Selesai"];
-            orders.forEach(o => {
-                const currentIdx = statuses.indexOf(o.status);
-                container.innerHTML += `<div style="background:var(--bg-deep); padding:14px; border-radius:14px; margin-bottom:12px; border:1px solid var(--border-color);"><div style="font-weight:700; color:var(--primary); margin-bottom:4px;">Ref: #${o.id} - Status: ${o.status}</div><div style="font-size:11px; color:var(--text-muted);">${o.product} (${formatRupiah(o.price)})</div><div class="status-timeline"><div class="status-step ${currentIdx>=0?'completed':''}"><div class="status-dot">✓</div><div style="font-size:11px;">Menunggu Konfirmasi</div></div><div class="status-step ${currentIdx>=1?'completed':''}"><div class="status-dot">✓</div><div style="font-size:11px;">Sedang Dikemas</div></div><div class="status-step ${currentIdx>=2?'completed':''}"><div class="status-dot">✓</div><div style="font-size:11px;">Sedang Diantar</div></div><div class="status-step ${currentIdx>=3?'completed':''}"><div class="status-dot">✓</div><div style="font-size:11px;">Selesai</div></div></div></div>`;
+
+            orders.forEach(found => {
+                const currentIdx = statuses.indexOf(found.status);
+                const wrapper = document.createElement('div');
+                wrapper.style.marginBottom = "20px";
+                wrapper.style.borderBottom = "1px solid var(--border-color)";
+                wrapper.style.paddingBottom = "16px";
+
+                wrapper.innerHTML = `
+                    <div style="background:var(--bg-card); border:1px solid var(--border-color); padding:14px; border-radius:12px; margin-bottom:12px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                            <span style="font-size:11px; font-weight:800; color:var(--text-main);">Ref: #${found.id}</span>
+                            <span style="font-size:10px; font-weight:700; color:var(--text-muted);">${found.time}</span>
+                        </div>
+                        <div style="font-size:12px; font-weight:700; margin-bottom:3px;">${found.product} - Size ${found.size} (${formatRupiah(found.price)})</div>
+                        <div style="font-size:11px; color:var(--text-muted);">Penerima: ${found.name} (${found.phone})</div>
+                        <div style="font-size:11px; color:var(--text-muted);">Alamat: ${found.address}</div>
+                    </div>
+                    
+                    <h4 style="font-size:12px; font-weight:700; margin-bottom:8px;">Status Perjalanan Paket</h4>
+                    <div class="status-timeline">
+                        <div class="status-step ${currentIdx >= 0 ? 'completed' : ''}">
+                            <div class="status-dot"><i data-lucide="check" size="10"></i></div>
+                            <div class="status-content">
+                                <h5>Menunggu Konfirmasi</h5>
+                                <p>Pesanan diterima dan divalidasi admin toko.</p>
+                            </div>
+                        </div>
+                        <div class="status-step ${currentIdx >= 1 ? 'completed' : ''}">
+                            <div class="status-dot"><i data-lucide="check" size="10"></i></div>
+                            <div class="status-content">
+                                <h5>Sepatu Sedang Dikemas</h5>
+                                <p>Quality control ukuran dan kondisi box sepatu aman.</p>
+                            </div>
+                        </div>
+                        <div class="status-step ${currentIdx >= 2 ? 'completed' : ''}">
+                            <div class="status-dot"><i data-lucide="check" size="10"></i></div>
+                            <div class="status-content">
+                                <h5>Kurir Mengantar Paket</h5>
+                                <p>Paket dalam perjalanan ke alamat tujuan.</p>
+                            </div>
+                        </div>
+                        <div class="status-step ${currentIdx >= 3 ? 'completed' : ''}">
+                            <div class="status-dot"><i data-lucide="check" size="10"></i></div>
+                            <div class="status-content">
+                                <h5>Pesanan Selesai</h5>
+                                <p>Paket diterima dengan selamat.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(wrapper);
             });
-            showView('view-cek-pesanan');
             lucide.createIcons();
         }
 
-        window.onload = initDB;
+        async function updateOrderStatus(orderId, newStatus) {
+            const ord = orders.find(o => o.id === Number(orderId));
+            if(ord) {
+                ord.status = newStatus;
+                await saveDataToStore("orders", ord);
+                showToast(`Status pesanan #${ord.id} diubah: ${newStatus}`);
+                renderAdminOrders();
+            }
+        }
+
+        function renderAdminOrders() {
+            const container = document.getElementById('adminOrderListContainer');
+            container.innerHTML = '';
+            if(orders.length === 0) {
+                container.innerHTML = `<p style="font-size:11px; color:var(--text-muted); text-align:center;">Belum ada pembelian masuk.</p>`;
+                return;
+            }
+            orders.forEach(o => {
+                const box = document.createElement('div');
+                box.className = 'admin-item';
+                box.style.flexDirection = 'column';
+                box.style.alignItems = 'flex-start';
+                box.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; width:100%; margin-bottom:6px; align-items:center; flex-wrap:wrap; gap:6px;">
+                        <strong style="color:var(--text-main); font-size:11px;">Ref: #${o.id} (${o.time})</strong>
+                        <select class="shop-input" style="width: 150px; padding: 5px 8px; font-size: 11px;" onchange="updateOrderStatus(${o.id}, this.value)">
+                            <option value="Menunggu Konfirmasi" ${o.status === 'Menunggu Konfirmasi' ? 'selected' : ''}>Menunggu Konfirmasi</option>
+                            <option value="Sedang Dikemas" ${o.status === 'Sedang Dikemas' ? 'selected' : ''}>Sedang Dikemas</option>
+                            <option value="Sedang Diantar" ${o.status === 'Sedang Diantar' ? 'selected' : ''}>Sedang Diantar</option>
+                            <option value="Selesai" ${o.status === 'Selesai' ? 'selected' : ''}>Selesai</option>
+                        </select>
+                    </div>
+                    <div style="font-size:11px; line-height:1.4;">
+                        <strong>Produk:</strong> ${o.product} - Size ${o.size} (${formatRupiah(o.price)})<br>
+                        <strong>Pemesan:</strong> ${o.name} (${o.phone})<br>
+                        <strong>Alamat:</strong> ${o.address}
+                    </div>
+                `;
+                container.appendChild(box);
+            });
+            lucide.createIcons();
+        }
+
+        window.onload = init;
     </script>
 </body>
 </html>

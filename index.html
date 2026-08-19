@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FADLI KICKS // Elite Sneaker Emporium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #f4f5f7;
+            --bg-panel: rgba(255, 255, 255, 0.9);
+            --bg-card: #ffffff;
+            --primary: #10b981;
+            --primary-light: #34d399;
+            --primary-dark: #059669;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: rgba(16, 185, 129, 0.22);
+            --glass-blur: blur(20px);
+        }
+        .dark-mode {
+            --bg-deep: #07090e;
+            --bg-panel: rgba(15, 23, 42, 0.85);
+            --bg-card: #111827;
+            --primary: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(16, 185, 129, 0.3);
+            --glass-blur: blur(24px);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-deep); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
+        
+        #navbar {
+            background: var(--bg-panel); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--border-color);
+            padding: 14px 28px; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center;
+        }
+        .brand-title { font-size: 20px; font-weight: 800; color: var(--primary); cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .nav-actions { display: flex; gap: 10px; align-items: center; }
+        .nav-btn { background: var(--bg-deep); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 14px; border-radius: 12px; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .nav-btn:hover { border-color: var(--primary); }
+        .cart-badge-icon { position: relative; }
+        .cart-count { position: absolute; top: -6px; right: -8px; background: var(--primary); color: #fff; font-size: 9px; font-weight: 800; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+        .container { width: 100%; max-width: 1200px; margin: auto; padding: 24px 20px; flex: 1; }
+
+        #floating-chat-btn {
+            position: fixed; bottom: 24px; right: 24px; z-index: 998;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            color: #ffffff; width: 58px; height: 58px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.45);
+        }
+        .floating-chat-badge { position: absolute; top: -2px; right: -2px; background: #ef4444; color: #fff; font-size: 9px; font-weight: 800; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg-deep); }
+
+        .chat-box-container { display: flex; flex-direction: column; height: 380px; background: var(--bg-deep); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-top: 8px; }
+        .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .chat-msg { max-width: 75%; padding: 10px 14px; border-radius: 14px; font-size: 12px; line-height: 1.4; word-break: break-word; }
+        .chat-msg.customer { background: var(--primary); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .chat-msg.admin { background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border-color); align-self: flex-start; border-bottom-left-radius: 4px; }
+        .chat-input-row { display: flex; padding: 10px; background: var(--bg-panel); border-top: 1px solid var(--border-color); gap: 8px; }
+
+        .flash-sale-box { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: #fff; padding: 14px 22px; border-radius: 18px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+        .category-filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 20px; }
+        .category-pill { background: var(--bg-panel); border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 16px; border-radius: 14px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+        .category-pill.active, .category-pill:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+        .search-box { position: relative; width: 100%; margin-bottom: 20px; }
+        .search-box input { width: 100%; padding: 13px 18px 13px 46px; border-radius: 16px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-main); font-size: 13px; outline: none; }
+        .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+
+        .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+        @media(min-width: 768px) { .products-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
+        .product-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; transition: 0.25s ease; }
+        .product-card:hover { transform: translateY(-4px); border-color: var(--primary); }
+        .product-media-wrap { width: 100%; height: 160px; background: var(--bg-deep); position: relative; }
+        .product-img { width: 100%; height: 100%; object-fit: cover; }
+        .product-body { padding: 14px; display: flex; flex-direction: column; flex-grow: 1; }
+        .product-title { font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+        .product-price { font-size: 13px; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
+        .btn-buy { margin-top: auto; width: 100%; background: var(--primary); color: #fff; border: none; padding: 10px; border-radius: 12px; font-weight: 700; font-size: 11px; cursor: pointer; text-transform: uppercase; }
+
+        .panel-box { background: var(--bg-panel); backdrop-filter: var(--glass-blur); border: 1px solid var(--border-color); padding: 24px; border-radius: 24px; margin-bottom: 20px; }
+        .panel-box h2 { font-size: 16px; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
+        .shop-input { width: 100%; padding: 12px 16px; border-radius: 14px; border: 1px solid var(--border-color); background: var(--bg-deep); color: var(--text-main); font-size: 13px; outline: none; }
+        .btn-main { width: 100%; background: var(--primary); color: #ffffff; padding: 13px; border: none; border-radius: 14px; font-weight: 800; font-size: 12px; cursor: pointer; text-transform: uppercase; margin-top: 8px; }
+        .btn-dm { width: 100%; background: #0ea5e9; color: #ffffff; padding: 13px; border: none; border-radius: 14px; font-weight: 800; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
+
+        .status-timeline { display: flex; flex-direction: column; gap: 14px; margin-top: 14px; }
+        .status-step { display: flex; gap: 12px; align-items: flex-start; position: relative; }
+        .status-dot { width: 24px; height: 24px; border-radius: 50%; background: var(--bg-deep); border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; }
+        .status-step.completed .status-dot { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; }
+        .toast-item { background: var(--bg-panel); border: 1px solid var(--border-color); color: var(--text-main); padding: 12px 16px; border-radius: 14px; font-size: 12px; font-weight: 700; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    </style>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <div id="floating-chat-btn" onclick="openCustomerChat()" title="Buka DM Chat Toko">
+        <i data-lucide="message-circle" size="24"></i>
+        <span class="floating-chat-badge" id="floatingChatBadge">0</span>
+    </div>
+
+    <nav id="navbar">
+        <div class="brand-title" onclick="showView('view-user')">
+            <i data-lucide="zap" size="18"></i> FADLI KICKS
+        </div>
+        <div class="nav-actions">
+            <button class="nav-btn cart-badge-icon" onclick="openCartView()">
+                <i data-lucide="shopping-cart" size="15"></i>
+                <span class="cart-count" id="cartBadgeCount">0</span>
+            </button>
+            <button class="nav-btn" onclick="openCekPesanan()">
+                <i data-lucide="package" size="15"></i> Cek Pesanan
+            </button>
+            <button class="nav-btn" onclick="toggleTheme()"><i data-lucide="sun-medium" id="themeIcon" size="15"></i></button>
+        </div>
+    </nav>
+
+    <div id="toast-container"></div>
+
+    <div class="container">
+        
+        <div id="view-user" class="fade-in-view">
+            <div class="flash-sale-box">
+                <div>⚡ FLASH SALE EKSLUSIF FADLI KICKS HARI INI!</div>
+                <div id="flashCountdown">04 : 58 : 32</div>
+            </div>
+
+            <div class="category-filters">
+                <div class="category-pill active" onclick="filterCategory('All', this)">Semua Koleksi</div>
+                <div class="category-pill" onclick="filterCategory('Running', this)">🏃‍♂️ Running</div>
+                <div class="category-pill" onclick="filterCategory('Streetwear', this)">🔥 Streetwear</div>
+                <div class="category-pill" onclick="filterCategory('Basketball', this)">🏀 Basketball</div>
+            </div>
+
+            <div class="search-box">
+                <i data-lucide="search" size="16" class="search-icon"></i>
+                <input type="text" id="searchKeyword" placeholder="Cari model sepatu impian..." oninput="renderCatalog()">
+            </div>
+
+            <div class="products-grid" id="catalogGrid"></div>
+        </div>
+
+        <div id="view-chat" style="display: none;">
+            <button class="nav-btn" style="width: fit-content; margin-bottom: 16px;" onclick="showView('view-user')">
+                <i data-lucide="arrow-left" size="14"></i> Kembali
+            </button>
+            <div class="panel-box">
+                <h2><i data-lucide="message-square" size="16"></i> DM Live Chat dengan Admin Fadli Kicks</h2>
+                <div class="chat-box-container">
+                    <div class="chat-messages" id="customerChatMessages"></div>
+                    <div class="chat-input-row">
+                        <input type="text" id="customerChatInput" class="shop-input" placeholder="Tulis pesan atau tanya stok sepatu..." onkeypress="if(event.key==='Enter') sendCustomerChat()">
+                        <button class="btn-main" style="width:90px; margin-top:0;" onclick="sendCustomerChat()">Kirim</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-cart" style="display: none;">
+            <button class="nav-btn" style="width: fit-content; margin-bottom: 16px;" onclick="showView('view-user')"><i data-lucide="arrow-left" size="14"></i> Kembali</button>
+            <div class="panel-box">
+                <h2><i data-lucide="shopping-cart" size="16"></i> Keranjang Belanja Anda</h2>
+                <div id="cartItemsContainer"></div>
+            </div>
+        </div>
+
+        <div id="view-cek-pesanan" style="display: none;">
+            <button class="nav-btn" style="width: fit-content; margin-bottom: 16px;" onclick="showView('view-user')"><i data-lucide="arrow-left" size="14"></i> Kembali</button>
+            <div class="panel-box">
+                <h2><i data-lucide="truck" size="16"></i> Status Perjalanan Pesanan Anda</h2>
+                <div id="cekPesananResultContainer"></div>
+            </div>
+        </div>
+
+        <div id="view-detail" style="display: none;">
+            <button class="nav-btn" style="width: fit-content; margin-bottom: 16px;" onclick="showView('view-user')"><i data-lucide="arrow-left" size="14"></i> Kembali</button>
+            <div id="detailContentContainer"></div>
+        </div>
+
+        <div id="view-checkout" style="display: none;">
+            <button class="nav-btn" style="width: fit-content; margin-bottom: 16px;" onclick="showView('view-cart')"><i data-lucide="arrow-left" size="14"></i> Kembali</button>
+            <div class="panel-box">
+                <h2><i data-lucide="shopping-cart" size="16"></i> Form Checkout Pembelian</h2>
+                <div id="checkoutSummary" style="margin-bottom:14px; font-weight:700;"></div>
+                <form id="checkoutForm" onsubmit="submitOrder(event)">
+                    <div style="margin-bottom:10px;"><label style="font-size:11px; font-weight:700; color:var(--text-muted)">NAMA PENERIMA</label><input type="text" id="bName" class="shop-input" required></div>
+                    <div style="margin-bottom:10px;"><label style="font-size:11px; font-weight:700; color:var(--text-muted)">NOMOR WHATSAPP</label><input type="text" id="bPhone" class="shop-input" required></div>
+                    <div style="margin-bottom:10px;"><label style="font-size:11px; font-weight:700; color:var(--text-muted)">ALAMAT LENGKAP</label><textarea id="bAddress" class="shop-input" rows="3" required></textarea></div>
+                    <button type="submit" class="btn-main">Kirim Pesanan Sekarang</button>
+                </form>
+                <div id="orderSuccessBox" style="display:none; text-align:center; padding:20px;">
+                    <h3 style="color:var(--primary); margin-bottom:6px;">Pesanan Berhasil Dibuat!</h3>
+                    <p style="font-size:12px; color:var(--text-muted);">Nomor Referensi: <strong id="refId"></strong></p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let db;
+        let products = [];
+        let cart = [];
+        let orders = [];
+        let chatMessages = [];
+        let activeCategory = 'All';
+        let selectedProduct = null;
+        let isDarkMode = false;
+
+        function initDB() {
+            return new Promise((resolve) => {
+                const request = indexedDB.open("FadliKicksEstheticDB", 10);
+                request.onsuccess = event => {
+                    db = event.target.result;
+                    loadCustomerData().then(resolve);
+                };
+            });
+        }
+
+        function loadCustomerData() {
+            return new Promise((resolve) => {
+                const tx = db.transaction(["products", "cart", "orders", "chats"], "readonly");
+                tx.objectStore("products").getAll().onsuccess = e => { products = e.target.result || []; renderCatalog(); };
+                tx.objectStore("cart").getAll().onsuccess = e => { cart = e.target.result || []; updateCartBadge(); };
+                tx.objectStore("orders").getAll().onsuccess = e => { orders = e.target.result || []; };
+                tx.objectStore("chats").getAll().onsuccess = e => {
+                    chatMessages = e.target.result || [];
+                    updateFloatingBadge();
+                    if(document.getElementById('view-chat').style.display === 'block') renderCustomerChatUI();
+                    resolve();
+                };
+            });
+        }
+
+        function saveDataToStore(storeName, itemObj) {
+            return new Promise((resolve) => {
+                const tx = db.transaction(storeName, "readwrite");
+                const store = tx.objectStore(storeName);
+                const req = store.put(itemObj);
+                req.onsuccess = () => resolve();
+            });
+        }
+
+        function deleteDataFromStore(storeName, id) {
+            return new Promise((resolve) => {
+                const tx = db.transaction(storeName, "readwrite");
+                const store = tx.objectStore(storeName);
+                const req = store.delete(id);
+                req.onsuccess = () => resolve();
+            });
+        }
+
+        setInterval(() => { if(db) loadCustomerData(); }, 1500);
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = 'toast-item';
+            t.innerText = msg;
+            container.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        function formatRupiah(num) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+        }
+
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode', isDarkMode);
+            document.getElementById('themeIcon').setAttribute('data-lucide', isDarkMode ? 'sun-medium' : 'moon');
+            lucide.createIcons();
+        }
+
+        function showView(viewId) {
+            ['view-user', 'view-chat', 'view-cart', 'view-cek-pesanan', 'view-detail', 'view-checkout'].forEach(id => {
+                document.getElementById(id).style.display = (id === viewId) ? 'block' : 'none';
+            });
+            window.scrollTo({top:0, behavior:'smooth'});
+        }
+
+        function updateCartBadge() { document.getElementById('cartBadgeCount').innerText = cart.length; }
+        function updateFloatingBadge() { document.getElementById('floatingChatBadge').innerText = chatMessages.length; }
+
+        function filterCategory(cat, el) {
+            activeCategory = cat;
+            document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+            el.classList.add('active');
+            renderCatalog();
+        }
+
+        function renderCatalog() {
+            const grid = document.getElementById('catalogGrid');
+            const keyword = document.getElementById('searchKeyword').value.toLowerCase();
+            grid.innerHTML = '';
+            const filtered = products.filter(p => p.name.toLowerCase().includes(keyword) && (activeCategory === 'All' || p.category === activeCategory));
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:30px; color:var(--text-muted);">Belum ada produk sepatu.</div>`;
+                return;
+            }
+            filtered.forEach(p => {
+                grid.innerHTML += `<div class="product-card" onclick="openDetail(${p.id})"><div class="product-media-wrap"><img src="${p.img}" class="product-img"></div><div class="product-body"><div class="product-title">${p.name}</div><div class="product-price">${formatRupiah(p.price)}</div><button class="btn-buy">Lihat Detail</button></div></div>`;
+            });
+            lucide.createIcons();
+        }
+
+        function openDetail(id) {
+            const p = products.find(prod => prod.id === Number(id));
+            if(!p) return;
+            selectedProduct = p;
+            document.getElementById('detailContentContainer').innerHTML = `<div class="panel-box"><h2>${p.name}</h2><img src="${p.img}" style="width:100%; max-height:300px; object-fit:cover; border-radius:12px; margin-bottom:12px;"><div style="color:var(--primary); font-weight:800; font-size:18px; margin-bottom:8px;">${formatRupiah(p.price)}</div><p style="font-size:12px; color:var(--text-muted); margin-bottom:14px;">${p.desc}</p><button class="btn-main" onclick="addToCart(${p.id})">Masukkan ke Keranjang</button><button class="btn-dm" onclick="openCustomerChatWithProduct('${p.name}')"><i data-lucide="message-square" size="14"></i> Tanya via DM Chat</button></div>`;
+            showView('view-detail');
+            lucide.createIcons();
+        }
+
+        async function addToCart(id) {
+            const p = products.find(prod => prod.id === Number(id));
+            const item = { id: Date.now(), productId: p.id, name: p.name, price: p.price, img: p.img, size: '42' };
+            cart.push(item);
+            await saveDataToStore("cart", item);
+            updateCartBadge();
+            showToast("Dimasukkan ke keranjang!");
+            openCartView();
+        }
+
+        function openCartView() {
+            const container = document.getElementById('cartItemsContainer');
+            container.innerHTML = '';
+            if(cart.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted);">Keranjang kosong.</div>`;
+                showView('view-cart');
+                return;
+            }
+            let total = 0;
+            cart.forEach(item => {
+                total += item.price;
+                container.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-deep); padding:10px; border-radius:10px; margin-bottom:8px;"><div style="font-size:12px; font-weight:700;">${item.name}<br><span style="color:var(--primary);">${formatRupiah(item.price)}</span></div><button style="background:none; border:none; color:red; cursor:pointer;" onclick="removeFromCart(${item.id})">Hapus</button></div>`;
+            });
+            container.innerHTML += `<button class="btn-main" onclick="setupCheckout()">Checkout Total (${formatRupiah(total)})</button>`;
+            showView('view-cart');
+        }
+
+        async function removeFromCart(id) {
+            cart = cart.filter(c => c.id !== Number(id));
+            await deleteDataFromStore("cart", Number(id));
+            updateCartBadge();
+            openCartView();
+        }
+
+        function openCustomerChat() { renderCustomerChatUI(); showView('view-chat'); }
+        function openCustomerChatWithProduct(name) {
+            const initialText = `Halo Admin, apakah sepatu ${name} ready?`;
+            appendAndSaveChat('customer', initialText);
+            showView('view-chat');
+        }
+
+        function renderCustomerChatUI() {
+            const box = document.getElementById('customerChatMessages');
+            box.innerHTML = '';
+            if(chatMessages.length === 0) {
+                box.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">Mulai percakapan dengan admin toko.</div>`;
+                return;
+            }
+            chatMessages.forEach(msg => {
+                box.innerHTML += `<div class="chat-msg ${msg.sender}"><div><b>${msg.sender === 'customer' ? 'Anda' : 'Admin'}:</b> ${msg.text}</div><div style="font-size:9px; opacity:0.7; margin-top:2px; text-align:right;">${msg.time}</div></div>`;
+            });
+            box.scrollTop = box.scrollHeight;
+        }
+
+        async function sendCustomerChat() {
+            const input = document.getElementById('customerChatInput');
+            const val = input.value.trim();
+            if(!val) return;
+            await appendAndSaveChat('customer', val);
+            input.value = '';
+        }
+
+        async function appendAndSaveChat(sender, text) {
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            const msgObj = { sender, text, time: timeStr };
+            chatMessages.push(msgObj);
+            await saveDataToStore("chats", msgObj);
+            updateFloatingBadge();
+            renderCustomerChatUI();
+        }
+
+        function setupCheckout() {
+            document.getElementById('checkoutSummary').innerText = `Total Item di Keranjang: ${cart.length} Produk`;
+            showView('view-checkout');
+        }
+
+        async function submitOrder(e) {
+            e.preventDefault();
+            const now = new Date();
+            const timeString = `${now.getDate()} Mins, ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            const newOrder = {
+                id: Math.floor(100000 + Math.random() * 900000),
+                product: cart[0] ? cart[0].name : "Paket Belanja",
+                price: cart.reduce((a,b)=>a+b.price, 0),
+                size: '42',
+                name: document.getElementById('bName').value,
+                phone: document.getElementById('bPhone').value,
+                address: document.getElementById('bAddress').value,
+                status: "Menunggu Konfirmasi",
+                time: timeString
+            };
+            orders.unshift(newOrder);
+            await saveDataToStore("orders", newOrder);
+            document.getElementById('checkoutForm').style.display = 'none';
+            document.getElementById('refId').innerText = newOrder.id;
+            document.getElementById('orderSuccessBox').style.display = 'block';
+            showToast("Pesanan Berhasil!");
+        }
+
+        function openCekPesanan() {
+            const container = document.getElementById('cekPesananResultContainer');
+            container.innerHTML = '';
+            if(orders.length === 0) {
+                container.innerHTML = `<p style="font-size:12px; color:var(--text-muted); text-align:center;">Belum ada pesanan.</p>`;
+                showView('view-cek-pesanan');
+                return;
+            }
+            const statuses = ["Menunggu Konfirmasi", "Sedang Dikemas", "Sedang Diantar", "Selesai"];
+            orders.forEach(o => {
+                const currentIdx = statuses.indexOf(o.status);
+                container.innerHTML += `<div style="background:var(--bg-deep); padding:14px; border-radius:14px; margin-bottom:12px; border:1px solid var(--border-color);"><div style="font-weight:700; color:var(--primary); margin-bottom:4px;">Ref: #${o.id} - Status: ${o.status}</div><div style="font-size:11px; color:var(--text-muted);">${o.product} (${formatRupiah(o.price)})</div><div class="status-timeline"><div class="status-step ${currentIdx>=0?'completed':''}"><div class="status-dot">✓</div><div style="font-size:11px;">Menunggu Konfirmasi</div></div><div class="status-step ${currentIdx>=1?'completed':''}"><div class="status-dot">✓</div><div style="font-size:11px;">Sedang Dikemas</div></div><div class="status-step ${currentIdx>=2?'completed':''}"><div class="status-dot">✓</div><div style="font-size:11px;">Sedang Diantar</div></div><div class="status-step ${currentIdx>=3?'completed':''}"><div class="status-dot">✓</div><div style="font-size:11px;">Selesai</div></div></div></div>`;
+            });
+            showView('view-cek-pesanan');
+            lucide.createIcons();
+        }
+
+        window.onload = initDB;
+    </script>
+</body>
+</html>

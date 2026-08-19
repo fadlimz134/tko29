@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FADLI KICKS // Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #f4f5f7;
+            --bg-panel: rgba(255, 255, 255, 0.9);
+            --bg-card: #ffffff;
+            --primary: #10b981;
+            --primary-light: #34d399;
+            --primary-dark: #059669;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: rgba(16, 185, 129, 0.22);
+            --glass-blur: blur(20px);
+        }
+        .dark-mode {
+            --bg-deep: #07090e;
+            --bg-panel: rgba(15, 23, 42, 0.85);
+            --bg-card: #111827;
+            --primary: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: rgba(16, 185, 129, 0.3);
+            --glass-blur: blur(24px);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-deep); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; padding: 20px; }
+        .container { width: 100%; max-width: 1000px; margin: auto; }
+        .panel-box { background: var(--bg-panel); backdrop-filter: var(--glass-blur); border: 1px solid var(--border-color); padding: 24px; border-radius: 24px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+        .panel-box h2 { font-size: 16px; font-weight: 700; margin-bottom: 18px; color: var(--text-main); display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
+        .form-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+        @media(min-width: 768px) { .form-grid { grid-template-columns: repeat(2, 1fr); } }
+        .input-group { margin-bottom: 12px; }
+        .input-group.full { grid-column: 1 / -1; }
+        .input-group label { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; }
+        .shop-input, .shop-file { width: 100%; padding: 12px 16px; border-radius: 14px; border: 1px solid var(--border-color); background: var(--bg-deep); color: var(--text-main); font-size: 13px; outline: none; font-family: inherit; }
+        .shop-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15); }
+        .btn-main { width: 100%; background: var(--primary); color: #ffffff; padding: 13px; border: none; border-radius: 14px; font-weight: 800; font-size: 12px; cursor: pointer; text-transform: uppercase; margin-top: 8px; }
+        .btn-main:hover { background: var(--primary-dark); }
+        .btn-danger-outline { background: transparent; border: 1px solid rgba(239, 68, 68, 0.4); color: #ef4444; padding: 12px; border-radius: 14px; font-weight: 700; font-size: 12px; cursor: pointer; width: 100%; margin-top: 8px; }
+        
+        .chat-box-container { display: flex; flex-direction: column; height: 400px; background: var(--bg-deep); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; margin-top: 8px; }
+        .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .chat-msg { max-width: 75%; padding: 10px 14px; border-radius: 14px; font-size: 12px; line-height: 1.4; word-break: break-word; }
+        .chat-msg.customer { background: var(--bg-panel); color: var(--text-main); border: 1px solid var(--border-color); align-self: flex-start; border-bottom-left-radius: 4px; }
+        .chat-msg.admin { background: var(--primary); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .chat-input-row { display: flex; padding: 10px; background: var(--bg-panel); border-top: 1px solid var(--border-color); gap: 8px; }
+
+        .admin-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-deep); border: 1px solid var(--border-color); padding: 14px; border-radius: 14px; margin-bottom: 10px; gap: 10px; }
+        .admin-item-info { display: flex; align-items: center; gap: 12px; }
+        .admin-item-img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; }
+        .btn-sm { padding: 6px 12px; font-size: 11px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; }
+        .btn-edit { background: rgba(16, 185, 129, 0.1); color: var(--primary); border: 1px solid var(--border-color); }
+        .btn-del { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+        
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; }
+        .toast-item { background: var(--bg-panel); backdrop-filter: var(--glass-blur); border: 1px solid var(--border-color); color: var(--text-main); padding: 12px 16px; border-radius: 14px; font-size: 12px; font-weight: 700; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    </style>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <div id="toast-container"></div>
+
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h1 style="font-size: 22px; font-weight: 800; color: var(--primary);">FADLI KICKS // Admin Dashboard</h1>
+            <a href="customer.html" target="_blank" style="font-size: 12px; font-weight: 700; color: var(--primary); text-decoration: none; background: var(--bg-panel); padding: 8px 14px; border-radius: 12px; border: 1px solid var(--border-color);">Buka Halaman Customer ↗</a>
+        </div>
+
+        <div class="panel-box">
+            <h2><i data-lucide="message-square" size="16"></i> Live DM Chat (Pesan Masuk dari Pembeli)</h2>
+            <div class="chat-box-container">
+                <div class="chat-messages" id="adminChatMessagesBox"></div>
+                <div class="chat-input-row">
+                    <input type="text" id="adminChatInput" class="shop-input" placeholder="Balas pesan pembeli..." onkeypress="if(event.key==='Enter') sendAdminChat()">
+                    <button class="btn-main" style="width:90px; margin-top:0;" onclick="sendAdminChat()">Kirim</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-box">
+            <h2><i data-lucide="truck" size="16"></i> Kelola Data Supplier Sepatu</h2>
+            <form id="supplierForm" onsubmit="saveSupplier(event)" style="margin-bottom: 14px;">
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Nama Perusahaan Supplier</label>
+                        <input type="text" id="sName" class="shop-input" required placeholder="Cth: PT Fadli Jaya Supplier">
+                    </div>
+                    <div class="input-group">
+                        <label>Kontak / Telepon Supplier</label>
+                        <input type="text" id="sContact" class="shop-input" required placeholder="Cth: 081298765432">
+                    </div>
+                </div>
+                <button type="submit" class="btn-main">Tambah Supplier Baru</button>
+            </form>
+            <div id="adminSupplierList"></div>
+        </div>
+
+        <div class="panel-box">
+            <h2 id="formTitle"><i data-lucide="plus-circle" size="16"></i> Input & Edit Barang Sepatu</h2>
+            <form id="productForm" onsubmit="saveProduct(event)">
+                <input type="hidden" id="editIndex" value="">
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Nama Model Sepatu</label>
+                        <input type="text" id="pName" class="shop-input" required placeholder="Cth: Fadli Velocity Pro">
+                    </div>
+                    <div class="input-group">
+                        <label>Harga Jual (Rp)</label>
+                        <input type="number" id="pPrice" class="shop-input" required placeholder="Cth: 1850000">
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label>Pilih Kategori</label>
+                        <select id="pCategory" class="shop-input" required>
+                            <option value="Running">Running & Sport</option>
+                            <option value="Streetwear">Streetwear & Casual</option>
+                            <option value="Basketball">Basketball & High-Top</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Pilih Supplier</label>
+                        <select id="pSupplier" class="shop-input" required>
+                            <option value="">-- Pilih Supplier --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="input-group full">
+                        <label>Upload Foto Sepatu</label>
+                        <input type="file" id="pImgFile" class="shop-file" accept="image/*">
+                    </div>
+                </div>
+                <div class="input-group full">
+                    <label>Deskripsi & Ukuran Tersedia (Size)</label>
+                    <textarea id="pDesc" class="shop-input" rows="3" required placeholder="Cth: Nyaman dipakai lari, tersedia size 40, 41, 42, 43..."></textarea>
+                </div>
+                <button type="submit" class="btn-main" id="btnSubmitProd">Simpan Data Sepatu</button>
+                <button type="button" class="btn-danger-outline" id="btnCancel" style="display:none;" onclick="resetForm()">Batal Edit</button>
+            </form>
+        </div>
+
+        <div class="panel-box">
+            <h2><i data-lucide="tag" size="16"></i> Daftar Harga Barang (Katalog Aktif)</h2>
+            <div id="adminPriceListView"></div>
+        </div>
+
+        <div class="panel-box">
+            <h2><i data-lucide="clipboard-list" size="16"></i> Lihat Pembelian (Pesanan Masuk)</h2>
+            <div id="adminOrderListContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        let db;
+        let products = [];
+        let suppliers = [];
+        let orders = [];
+        let chatMessages = [];
+
+        let defaultProducts = [
+            { id: 1, name: "Velocity Red Fire Runner", price: 1850000, category: "Running", supplier: "PT Fadli Jaya Supplier", desc: "Sepatu lari berteknologi tinggi.", img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop" },
+            { id: 2, name: "Urban Street High-Top", price: 2100000, category: "Streetwear", supplier: "Sneaker Master Indo", desc: "Gaya kasual streetwear kekinian.", img: "https://images.unsplash.com/photo-1552346154-21d32810aba3?q=80&w=1000&auto=format&fit=crop" }
+        ];
+        let defaultSuppliers = [
+            { id: 1, name: "PT Fadli Jaya Supplier", contact: "081298765432" },
+            { id: 2, name: "Sneaker Master Indo", contact: "085612345678" }
+        ];
+
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open("FadliKicksEstheticDB", 10);
+                request.onerror = event => reject(event);
+                request.onupgradeneeded = event => {
+                    const database = event.target.result;
+                    if(!database.objectStoreNames.contains("products")) database.createObjectStore("products", { keyPath: "id" });
+                    if(!database.objectStoreNames.contains("suppliers")) database.createObjectStore("suppliers", { keyPath: "id" });
+                    if(!database.objectStoreNames.contains("orders")) database.createObjectStore("orders", { keyPath: "id" });
+                    if(!database.objectStoreNames.contains("cart")) database.createObjectStore("cart", { keyPath: "id", autoIncrement: true });
+                    if(!database.objectStoreNames.contains("chats")) database.createObjectStore("chats", { keyPath: "id", autoIncrement: true });
+                };
+                request.onsuccess = event => {
+                    db = event.target.result;
+                    loadAllData().then(resolve);
+                };
+            });
+        }
+
+        function loadAllData() {
+            return new Promise((resolve) => {
+                const tx = db.transaction(["products", "suppliers", "orders", "chats"], "readonly");
+                
+                tx.objectStore("products").getAll().onsuccess = e => {
+                    const res = e.target.result;
+                    products = (res && res.length > 0) ? res : defaultProducts;
+                    if(!res || res.length === 0) saveInitialData("products", defaultProducts);
+                };
+                tx.objectStore("suppliers").getAll().onsuccess = e => {
+                    const res = e.target.result;
+                    suppliers = (res && res.length > 0) ? res : defaultSuppliers;
+                    if(!res || res.length === 0) saveInitialData("suppliers", defaultSuppliers);
+                };
+                tx.objectStore("orders").getAll().onsuccess = e => { orders = e.target.result || []; };
+                tx.objectStore("chats").getAll().onsuccess = e => {
+                    chatMessages = e.target.result || [];
+                    refreshAdminPanel();
+                    resolve();
+                };
+            });
+        }
+
+        function saveInitialData(storeName, dataArray) {
+            const tx = db.transaction(storeName, "readwrite");
+            const store = tx.objectStore(storeName);
+            dataArray.forEach(item => store.put(item));
+        }
+
+        function saveDataToStore(storeName, itemObj) {
+            return new Promise((resolve) => {
+                const tx = db.transaction(storeName, "readwrite");
+                const store = tx.objectStore(storeName);
+                const req = store.put(itemObj);
+                req.onsuccess = () => resolve();
+            });
+        }
+
+        function deleteDataFromStore(storeName, id) {
+            return new Promise((resolve) => {
+                const tx = db.transaction(storeName, "readwrite");
+                const store = tx.objectStore(storeName);
+                const req = store.delete(id);
+                req.onsuccess = () => resolve();
+            });
+        }
+
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = 'toast-item';
+            t.innerText = msg;
+            container.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        function formatRupiah(num) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+        }
+
+        function refreshAdminPanel() {
+            renderAdminSuppliers();
+            populateSupplierDropdown();
+            renderAdminProducts();
+            renderAdminOrders();
+            renderAdminChatMessages();
+            lucide.createIcons();
+        }
+
+        setInterval(() => { if(db) loadAllData(); }, 1500);
+
+        async function saveSupplier(e) {
+            e.preventDefault();
+            const name = document.getElementById('sName').value;
+            const contact = document.getElementById('sContact').value;
+            const newSup = { id: Date.now(), name, contact };
+            suppliers.push(newSup);
+            await saveDataToStore("suppliers", newSup);
+            document.getElementById('supplierForm').reset();
+            refreshAdminPanel();
+            showToast("Supplier Ditambahkan");
+        }
+
+        async function deleteSupplier(id) {
+            if(confirm("Hapus supplier ini?")) {
+                suppliers = suppliers.filter(s => s.id !== Number(id));
+                await deleteDataFromStore("suppliers", Number(id));
+                refreshAdminPanel();
+                showToast("Supplier Dihapus");
+            }
+        }
+
+        function renderAdminSuppliers() {
+            const container = document.getElementById('adminSupplierList');
+            container.innerHTML = '';
+            if(suppliers.length === 0) { container.innerHTML = `<p style="font-size:12px; color:var(--text-muted); text-align:center;">Belum ada supplier.</p>`; return; }
+            suppliers.forEach(s => {
+                container.innerHTML += `<div class="admin-item"><div><div style="font-weight:700; font-size:12px;">${s.name}</div><div style="font-size:11px; color:var(--text-muted);">Kontak: ${s.contact}</div></div><button class="btn-sm btn-del" onclick="deleteSupplier(${s.id})">Hapus</button></div>`;
+            });
+        }
+
+        function populateSupplierDropdown() {
+            const select = document.getElementById('pSupplier');
+            select.innerHTML = `<option value="">-- Pilih Supplier --</option>`;
+            suppliers.forEach(s => { select.innerHTML += `<option value="${s.name}">${s.name}</option>`; });
+        }
+
+        function fileToDataUrl(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function saveProduct(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editIndex').value;
+            const name = document.getElementById('pName').value;
+            const price = Number(document.getElementById('pPrice').value);
+            const category = document.getElementById('pCategory').value;
+            const supplier = document.getElementById('pSupplier').value;
+            const desc = document.getElementById('pDesc').value;
+            const imgFile = document.getElementById('pImgFile').files[0];
+
+            let imgUrl = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop";
+            if(editId !== "") {
+                const existing = products.find(p => p.id === Number(editId));
+                if(existing) imgUrl = existing.img;
+            }
+            if(imgFile) imgUrl = await fileToDataUrl(imgFile);
+
+            const productId = editId !== "" ? Number(editId) : Date.now();
+            const newProd = { id: productId, name, price, category, supplier, desc, img: imgUrl };
+
+            if(editId !== "") {
+                const idx = products.findIndex(p => p.id === productId);
+                if(idx !== -1) products[idx] = newProd;
+                showToast("Sepatu Diperbarui");
+                resetForm();
+            } else {
+                products.unshift(newProd);
+                showToast("Sepatu Ditambahkan");
+                document.getElementById('productForm').reset();
+            }
+            await saveDataToStore("products", newProd);
+            refreshAdminPanel();
+        }
+
+        function renderAdminProducts() {
+            const containerList = document.getElementById('adminPriceListView');
+            containerList.innerHTML = '';
+            if(products.length === 0) { containerList.innerHTML = `<p style="font-size:12px; color:var(--text-muted); text-align:center;">Belum ada data barang.</p>`; return; }
+            products.forEach(p => {
+                containerList.innerHTML += `<div class="admin-item"><div class="admin-item-info"><img src="${p.img}" class="admin-item-img"><div><div style="font-weight:700; font-size:12px;">${p.name}</div><div style="font-size:11px; color:var(--primary); font-weight:700;">${formatRupiah(p.price)}</div></div></div><div style="display:flex; gap:6px;"><button class="btn-sm btn-edit" onclick="editProduct(${p.id})">Edit</button><button class="btn-sm btn-del" onclick="deleteProduct(${p.id})">Hapus</button></div></div>`;
+            });
+        }
+
+        function editProduct(id) {
+            const p = products.find(prod => prod.id === Number(id));
+            if(!p) return;
+            document.getElementById('editIndex').value = p.id;
+            document.getElementById('pName').value = p.name;
+            document.getElementById('pPrice').value = p.price;
+            document.getElementById('pCategory').value = p.category || 'Running';
+            document.getElementById('pSupplier').value = p.supplier;
+            document.getElementById('pDesc').value = p.desc;
+            document.getElementById('formTitle').innerHTML = `<i data-lucide="edit-3" size="16"></i> Edit Data Sepatu`;
+            document.getElementById('btnSubmitProd').innerText = "Simpan Perubahan";
+            document.getElementById('btnCancel').style.display = "block";
+        }
+
+        function resetForm() {
+            document.getElementById('editIndex').value = "";
+            document.getElementById('productForm').reset();
+            document.getElementById('formTitle').innerHTML = `<i data-lucide="plus-circle" size="16"></i> Input & Edit Barang Sepatu`;
+            document.getElementById('btnSubmitProd').innerText = "Simpan Data Sepatu";
+            document.getElementById('btnCancel').style.display = "none";
+        }
+
+        async function deleteProduct(id) {
+            if(confirm("Hapus sepatu ini?")) {
+                products = products.filter(p => p.id !== Number(id));
+                await deleteDataFromStore("products", Number(id));
+                refreshAdminPanel();
+                showToast("Sepatu Dihapus");
+            }
+        }
+
+        function renderAdminChatMessages() {
+            const box = document.getElementById('adminChatMessagesBox');
+            if(!box) return;
+            box.innerHTML = '';
+            if(chatMessages.length === 0) {
+                box.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">Belum ada pesan DM masuk.</div>`;
+                return;
+            }
+            chatMessages.forEach(msg => {
+                box.innerHTML += `<div class="chat-msg ${msg.sender}"><div><b>${msg.sender === 'customer' ? 'Pembeli' : 'Admin'}:</b> ${msg.text}</div><div style="font-size:9px; opacity:0.7; margin-top:2px; text-align:right;">${msg.time}</div></div>`;
+            });
+            box.scrollTop = box.scrollHeight;
+        }
+
+        async function sendAdminChat() {
+            const input = document.getElementById('adminChatInput');
+            const val = input.value.trim();
+            if(!val) return;
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            const msgObj = { sender: 'admin', text: val, time: timeStr };
+            chatMessages.push(msgObj);
+            await saveDataToStore("chats", msgObj);
+            input.value = '';
+            refreshAdminPanel();
+        }
+
+        function renderAdminOrders() {
+            const container = document.getElementById('adminOrderListContainer');
+            container.innerHTML = '';
+            if(orders.length === 0) { container.innerHTML = `<p style="font-size:12px; color:var(--text-muted); text-align:center;">Belum ada pembelian.</p>`; return; }
+            orders.forEach(o => {
+                container.innerHTML += `<div class="admin-item" style="flex-direction:column; align-items:flex-start;"><div style="display:flex; justify-content:space-between; width:100%; margin-bottom:6px;"><strong style="color:var(--primary); font-size:11px;">Ref: #${o.id}</strong><select class="shop-input" style="width:160px; padding:4px; font-size:11px;" onchange="updateOrderStatus(${o.id}, this.value)"><option value="Menunggu Konfirmasi" ${o.status==='Menunggu Konfirmasi'?'selected':''}>Menunggu Konfirmasi</option><option value="Sedang Dikemas" ${o.status==='Sedang Dikemas'?'selected':''}>Sedang Dikemas</option><option value="Sedang Diantar" ${o.status==='Sedang Diantar'?'selected':''}>Sedang Diantar</option><option value="Selesai" ${o.status==='Selesai'?'selected':''}>Selesai</option></select></div><div style="font-size:11px;"><b>${o.product}</b> (Size ${o.size}) - ${formatRupiah(o.price)}<br>Penerima: ${o.name} (${o.phone})<br>Alamat: ${o.address}</div></div>`;
+            });
+        }
+
+        async function updateOrderStatus(orderId, newStatus) {
+            const ord = orders.find(o => o.id === Number(orderId));
+            if(ord) {
+                ord.status = newStatus;
+                await saveDataToStore("orders", ord);
+                showToast(`Status #${ord.id} diubah ke ${newStatus}`);
+                renderAdminOrders();
+            }
+        }
+
+        window.onload = initDB;
+    </script>
+</body>
+</html>
